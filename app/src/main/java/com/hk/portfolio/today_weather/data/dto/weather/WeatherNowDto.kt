@@ -1,12 +1,10 @@
 package com.hk.portfolio.today_weather.data.dto.weather
 
-data class WeatherDto(
+data class WeatherNowDto(
     val baseDate: String?= "",
     val baseTime: String?= "",
     val category: String?= "",
-    val fcstDate: String?= "",
-    val fcstTime: String?= "",
-    val fcstValue: String?= "",
     val nx:Double?= null,
-    val ny:Double?= null
+    val ny:Double?= null,
+    val obsrValue: Int?= null
 )
