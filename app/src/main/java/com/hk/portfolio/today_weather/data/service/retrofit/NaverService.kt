@@ -1,5 +1,6 @@
 package com.hk.portfolio.today_weather.data.service.retrofit
 
+import com.hk.portfolio.today_weather.data.dto.naver.NaverResponseBody
 import retrofit2.http.GET
 import retrofit2.http.Header
 
@@ -9,5 +10,5 @@ interface NaverService {
     suspend fun getNaverLocationSearchList(
         @Header("X-Naver-Client-Id") clientId:String,
         @Header("X-Naver-Client-Secret") secretKey:String,
-    )
+    ): NaverResponseBody
 }
