@@ -11,14 +11,18 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import com.hk.portfolio.today_weather.core.AppDatabase
 import com.hk.portfolio.today_weather.ui.theme.TodayWeatherPortFolioTheme
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
+            val activity = LocalContext.current
             TodayWeatherPortFolioTheme {
                 // A surface container using the 'background' color from the theme
                 Scaffold(

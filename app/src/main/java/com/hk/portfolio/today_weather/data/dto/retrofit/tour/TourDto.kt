@@ -1,4 +1,4 @@
-package com.hk.portfolio.today_weather.data.dto.tour
+package com.hk.portfolio.today_weather.data.dto.retrofit.tour
 
 data class TourDto(
     val addr1: String? = "",

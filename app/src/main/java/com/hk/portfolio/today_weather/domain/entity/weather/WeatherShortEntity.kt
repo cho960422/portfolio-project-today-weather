@@ -1,11 +1,12 @@
 package com.hk.portfolio.today_weather.domain.entity.weather
 
-import com.hk.portfolio.today_weather.core.WeatherNowCategoryEnum
+import com.hk.portfolio.today_weather.core.WeatherShortCategoryEnum
 import java.time.LocalDateTime
 
-data class WeatherNowEntity(
+data class WeatherShortEntity(
     val baseDateTime: LocalDateTime,
-    val category: WeatherNowCategoryEnum,
+    val dateTime: LocalDateTime,
+    val category: WeatherShortCategoryEnum,
     val nx: Double,
     val ny: Double,
     val valueForCategory: Int

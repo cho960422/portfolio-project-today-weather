@@ -1,6 +1,6 @@
 package com.hk.portfolio.today_weather.data.service.retrofit
 
-import com.hk.portfolio.today_weather.data.dto.naver.NaverResponseBody
+import com.hk.portfolio.today_weather.data.dto.retrofit.naver.NaverResponseBody
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Query

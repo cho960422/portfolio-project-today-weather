@@ -1,4 +1,4 @@
-package com.hk.portfolio.today_weather.data.dto.weather
+package com.hk.portfolio.today_weather.data.dto.retrofit.weather
 
 data class WeatherNowDto(
     val baseDate: String?= "",
