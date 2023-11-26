@@ -1,7 +1,9 @@
 package com.hk.portfolio.today_weather.presentation.screen.write
 
+import android.app.TimePickerDialog
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -38,10 +41,13 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -57,6 +63,7 @@ import com.hk.portfolio.today_weather.presentation.screen.write.viewmodel.WriteS
 import com.hk.portfolio.today_weather.ui.component.CheckboxAndText
 import com.hk.portfolio.today_weather.ui.component.CustomAssistChip
 import com.hk.portfolio.today_weather.ui.component.CustomDatePicker
+import com.hk.portfolio.today_weather.ui.component.CustomTimePickerDialog
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -66,7 +73,7 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun WriteScreen(
     isNew: Boolean,
-    initPlace: String?,
+    initPlace: PlaceEntity?,
     onSearchButtonClicked: () -> Unit,
     onBackButtonClicked: () -> Unit
 ) {
@@ -75,9 +82,50 @@ fun WriteScreen(
     val openStartDatePicker = rememberSaveable { mutableStateOf(false) }
     val openEndDatePicker = rememberSaveable { mutableStateOf<LocalDate?>(null) }
     val openErrorTextDialog = rememberSaveable { mutableStateOf<String?>(null) }
+    val openTimeDialog = rememberSaveable { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val searchBarEnable = remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
+    val name = viewModel.name.value
+    val startDate = viewModel.startDate.value
+    val endDate = viewModel.endDate.value
+    val place = viewModel.place.value
+    val alarm = viewModel.alarm.value
+    val multiDay = viewModel.multiDay.value
+
+    fun showSnackbarShort(message: String) {
+        scope.launch {
+            snackbarHostState.showSnackbar(message, duration = SnackbarDuration.Short)
+        }
+    }
+
+    fun validate(
+        name: String,
+        start: LocalDate?,
+        end: LocalDate?,
+        multiDay: Boolean,
+        address: PlaceEntity?
+    ): Boolean {
+        return if (name.isEmpty()) {
+            showSnackbarShort("일정 이름을 입력해주세요.")
+            false
+        } else if (
+            start == null
+        ) {
+            showSnackbarShort("일정 시작일을 선택해주세요.")
+            false
+        } else if (end == null && multiDay) {
+            showSnackbarShort("일정 종료일을 선택해주세요.")
+            false
+        } else if (address == null) {
+            showSnackbarShort("장소를 입력해주세요")
+            false
+        } else true
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.onChangePlace(initPlace)
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -100,7 +148,12 @@ fun WriteScreen(
                     Text(
                         modifier = Modifier
                             .padding(horizontal = 16.dp)
-                            .clickable { onBackButtonClicked() },
+                            .clickable {
+                                val result = validate(name, startDate, endDate, multiDay, place)
+                                if (result) {
+                                    //TODO() 등록하기
+                                }
+                            },
                         text = "등록"
                     )
                 },
@@ -110,12 +163,6 @@ fun WriteScreen(
             )
         }
     ) { innerPadding ->
-        val name = viewModel.name.value
-        val startDate = viewModel.startDate.value
-        val endDate = viewModel.endDate.value
-        val place = viewModel.place.value
-        val alarm = viewModel.alarm.value
-        val multiDay = viewModel.multiDay.value
         val searchText = remember { mutableStateOf("") }
 
         val startDateStr = if (startDate != null) {
@@ -160,6 +207,18 @@ fun WriteScreen(
                 ) {
 
             }
+        }
+        if (openTimeDialog.value) {
+            CustomTimePickerDialog(
+                time = alarm,
+                onDismiss = {
+                    openTimeDialog.value = false
+                },
+                onConfirmButtonClicked = {
+                    openTimeDialog.value = false
+                    viewModel.onChangeAlarm(it)
+                }
+            )
         }
 
         Column(
@@ -243,8 +302,12 @@ fun WriteScreen(
             Spacer(modifier = Modifier.height(20.dp))
             Text(text = "주소")
             Spacer(modifier = Modifier.height(20.dp))
-            Text(text = "장소 이름 : $initPlace")
-            Text(text = "장소 상세정보")
+            if (place != null) {
+                Text(text = place.addressName)
+                Text(text = place.detail)
+            } else {
+                Text(text = "장소를 선택해주세요.")
+            }
             Spacer(modifier = Modifier.height(10.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -279,11 +342,24 @@ fun WriteScreen(
 
             CheckboxAndText(
                 onClicked = {
-                    viewModel.onChangeMultiDay()
+                    if (alarm != null) {
+                        viewModel.onChangeAlarm(null)
+                    } else {
+                        openTimeDialog.value = true
+                    }
                 },
-                check = multiDay,
+                check = alarm != null,
                 text = "일정 당일에 알림을 받겠습니다."
             )
+
+            if (alarm != null) {
+                CustomAssistChip(
+                    onClicked = {
+                        openTimeDialog.value = true
+                    },
+                    label = "${alarm.format(DateTimeFormatter.ofPattern("a hh:mm"))}에 알림"
+                )
+            }
         }
     }
 }

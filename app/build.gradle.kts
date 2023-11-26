@@ -73,6 +73,7 @@ dependencies {
 
     // retrofit2
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.google.code.gson:gson:2.10.1")
     // retrofit2에서 사용하는 json 직렬화 라이브러리
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     // hilt
@@ -95,6 +96,9 @@ dependencies {
 
     implementation("androidx.navigation:navigation-compose:$nav_version")
     implementation("androidx.compose.material3:material3:$material3_version")
+    // retrofit2 로그
+    implementation("com.squareup.okhttp3:okhttp:4.9.2")
+    implementation("com.squareup.okhttp3:logging-interceptor:3.14.9")
 }
 
 // Allow references to generated code

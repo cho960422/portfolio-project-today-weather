@@ -7,6 +7,7 @@ import com.hk.portfolio.today_weather.domain.entity.event.PlaceEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,7 +22,7 @@ class WriteScreenViewModel @Inject constructor(
         private set
     var place = mutableStateOf<PlaceEntity?>(null)
         private set
-    var alarm = mutableStateOf<LocalDateTime?>(null)
+    var alarm = mutableStateOf<LocalTime?>(null)
         private set
     var id = mutableStateOf<String?>(null)
         private set
@@ -52,19 +53,19 @@ class WriteScreenViewModel @Inject constructor(
         endDate.value = date
     }
 
-    fun onChangePlace(placeEntity: PlaceEntity) {
+    fun onChangePlace(placeEntity: PlaceEntity?) {
         changePlace(placeEntity)
     }
 
-    private fun changePlace(placeEntity: PlaceEntity) {
+    private fun changePlace(placeEntity: PlaceEntity?) {
         place.value = placeEntity
     }
 
-    fun onChangeAlarm(dateTime: LocalDateTime) {
+    fun onChangeAlarm(dateTime: LocalTime?) {
         changeAlarm(dateTime)
     }
 
-    private fun changeAlarm(dateTime: LocalDateTime) {
+    private fun changeAlarm(dateTime: LocalTime?) {
         alarm.value = dateTime
     }
 
