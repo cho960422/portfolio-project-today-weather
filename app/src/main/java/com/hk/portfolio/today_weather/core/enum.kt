@@ -106,3 +106,9 @@ enum class CloudCondition {
     Overcast,
     Unknown;
 }
+
+enum class SearchCategoryEnum(
+    val category:Int
+) {
+    AddressSearch(1);
+}

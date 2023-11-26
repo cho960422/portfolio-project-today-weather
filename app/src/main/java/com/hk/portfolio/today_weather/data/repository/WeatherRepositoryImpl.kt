@@ -12,10 +12,10 @@ import java.time.LocalDateTime
 import javax.inject.Inject
 
 class WeatherRepositoryImpl @Inject constructor(
-    @ActivityContext private val context: Context,
+    private val db: AppDatabase,
     private val service: WeatherService
 ): WeatherRepository {
-    val db = AppDatabase.getDatabase(context).weatherDao()
+    val dao = db.weatherDao()
 
     override suspend fun getWeather(
         nx: Double,

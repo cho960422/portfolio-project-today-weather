@@ -7,13 +7,16 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import com.hk.portfolio.today_weather.data.dto.room.EventLocation
+import com.hk.portfolio.today_weather.data.dto.room.SearchHistoryData
 import com.hk.portfolio.today_weather.data.dto.room.WeatherData
 import com.hk.portfolio.today_weather.data.dto.room.WeatherShortData
+import com.hk.portfolio.today_weather.data.service.room.EventDao
+import com.hk.portfolio.today_weather.data.service.room.SearchHistoryDao
 import com.hk.portfolio.today_weather.data.service.room.WeatherDao
 import com.hk.portfolio.today_weather.domain.mapper.LocalDateTimeConverter
 
 @Database(
-    entities = [WeatherData::class, WeatherShortData::class, EventLocation::class],
+    entities = [WeatherData::class, WeatherShortData::class, EventLocation::class, SearchHistoryData::class],
     version = 1
 )
 @TypeConverters(
@@ -21,6 +24,8 @@ import com.hk.portfolio.today_weather.domain.mapper.LocalDateTimeConverter
 )
 abstract class AppDatabase: RoomDatabase() {
     abstract fun weatherDao(): WeatherDao
+    abstract fun eventDao(): EventDao
+    abstract fun searchHistoryDao(): SearchHistoryDao
 
     companion object {
         @Volatile

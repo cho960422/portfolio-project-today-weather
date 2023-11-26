@@ -82,10 +82,19 @@ dependencies {
     val room_version = "2.6.0"
 
     implementation("androidx.room:room-runtime:$room_version")
+    implementation("androidx.room:room-ktx:$room_version")
     annotationProcessor("androidx.room:room-compiler:$room_version")
 
     // To use Kotlin annotation processing tool (kapt)
     kapt("androidx.room:room-compiler:$room_version")
+    // hiltViewModel
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+    // Navigation For Compose
+    val nav_version = "2.7.5"
+    val material3_version = "1.1.2"
+
+    implementation("androidx.navigation:navigation-compose:$nav_version")
+    implementation("androidx.compose.material3:material3:$material3_version")
 }
 
 // Allow references to generated code
