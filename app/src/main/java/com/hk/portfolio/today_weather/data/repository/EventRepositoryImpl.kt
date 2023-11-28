@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.hk.portfolio.today_weather.core.AppDatabase
+import com.hk.portfolio.today_weather.data.dto.room.EventLocation
 import com.hk.portfolio.today_weather.domain.entity.event.EventEntity
 import com.hk.portfolio.today_weather.domain.mapper.event.toEntity
 import com.hk.portfolio.today_weather.domain.repository.EventRepository
@@ -19,6 +20,15 @@ class EventRepositoryImpl @Inject constructor(
     override suspend fun getEventList(startDate: LocalDate?): List<EventEntity> {
         return dao.getEventList(startDate?: LocalDate.now()).map {
             it.toEntity()
+        }
+    }
+
+    override suspend fun insert(eventLocation: EventLocation): Boolean {
+        return try {
+            dao.upsertEvent(eventLocation)
+            true
+        } catch (e:Exception) {
+            false
         }
     }
 }

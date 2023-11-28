@@ -64,6 +64,7 @@ import com.hk.portfolio.today_weather.ui.component.CheckboxAndText
 import com.hk.portfolio.today_weather.ui.component.CustomAssistChip
 import com.hk.portfolio.today_weather.ui.component.CustomDatePicker
 import com.hk.portfolio.today_weather.ui.component.CustomTimePickerDialog
+import com.hk.portfolio.today_weather.ui.component.LoadingScreen
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -92,6 +93,7 @@ fun WriteScreen(
     val place = viewModel.place.value
     val alarm = viewModel.alarm.value
     val multiDay = viewModel.multiDay.value
+    val submitState = viewModel.submitState
 
     fun showSnackbarShort(message: String) {
         scope.launch {
@@ -151,7 +153,7 @@ fun WriteScreen(
                             .clickable {
                                 val result = validate(name, startDate, endDate, multiDay, place)
                                 if (result) {
-                                    //TODO() 등록하기
+                                    viewModel.submit()
                                 }
                             },
                         text = "등록"
@@ -359,6 +361,36 @@ fun WriteScreen(
                     },
                     label = "${alarm.format(DateTimeFormatter.ofPattern("a hh:mm"))}에 알림"
                 )
+            }
+        }
+
+        if (submitState.value.isLoading) {
+            LoadingScreen()
+        }
+        if (submitState.value.isError) {
+            AlertDialog(
+                onDismissRequest = { viewModel.confirmErrorMsg() },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            viewModel.confirmErrorMsg()
+                        }
+                    ) {
+                        Text(text = "확인")
+                    }
+                },
+                title = {
+                    Text(text = "오류")
+                },
+                text = {
+                    Text(text = submitState.value.message)
+                }
+            )
+        }
+
+        LaunchedEffect(submitState.value.data) {
+            if (submitState.value.data == true) {
+                onBackButtonClicked()
             }
         }
     }

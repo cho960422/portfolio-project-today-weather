@@ -16,3 +16,16 @@ fun EventLocation.toEntity(): EventEntity {
         )
     )
 }
+
+fun EventEntity.toDto(): EventLocation {
+    return EventLocation(
+        id = id,
+        eventName = eventName,
+        startDate = startDate,
+        endDate = endDate,
+        alarm = alarm,
+        placeName = place.addressName,
+        nx = place.nx,
+        ny = place.ny
+    )
+}
