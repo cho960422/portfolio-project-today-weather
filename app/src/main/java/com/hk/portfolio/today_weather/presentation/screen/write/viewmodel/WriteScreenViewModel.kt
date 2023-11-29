@@ -104,7 +104,8 @@ class WriteScreenViewModel @Inject constructor(
             startDate = startDate.value!!,
             endDate = endDate.value,
             place = place.value!!,
-            alarm = alarmDate
+            alarm = alarmDate,
+            updateAt = LocalDateTime.now()
         )
         viewModelScope.launch(Dispatchers.IO) {
             insertEventUseCase(request).onEach {

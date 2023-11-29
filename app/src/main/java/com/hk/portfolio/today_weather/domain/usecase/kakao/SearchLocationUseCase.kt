@@ -3,7 +3,7 @@ package com.hk.portfolio.today_weather.domain.usecase.kakao
 import com.hk.portfolio.today_weather.core.JobState
 import com.hk.portfolio.today_weather.domain.entity.kakao.KakaoLocationEntity
 import com.hk.portfolio.today_weather.domain.repository.KakaoLocationRepository
-import com.hk.portfolio.today_weather.domain.usecase.BaseUseCase
+import com.hk.portfolio.today_weather.domain.usecase.CoroutineUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.lang.Exception
@@ -11,7 +11,7 @@ import javax.inject.Inject
 
 class SearchLocationUseCase @Inject constructor(
     private val kakaoLocationRepository: KakaoLocationRepository
-) : BaseUseCase<SearchLocationUseCase.Request, Flow<JobState<List<KakaoLocationEntity>>>> {
+) : CoroutineUseCase<SearchLocationUseCase.Request, Flow<JobState<List<KakaoLocationEntity>>>> {
     data class Request(
         val query: String,
         val page: Int

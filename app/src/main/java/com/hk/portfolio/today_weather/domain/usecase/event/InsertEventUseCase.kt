@@ -4,14 +4,14 @@ import com.hk.portfolio.today_weather.core.JobState
 import com.hk.portfolio.today_weather.domain.entity.event.EventEntity
 import com.hk.portfolio.today_weather.domain.mapper.event.toDto
 import com.hk.portfolio.today_weather.domain.repository.EventRepository
-import com.hk.portfolio.today_weather.domain.usecase.BaseUseCase
+import com.hk.portfolio.today_weather.domain.usecase.CoroutineUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class InsertEventUseCase @Inject constructor(
     private val eventRepository: EventRepository
-): BaseUseCase<EventEntity, Flow<JobState<Boolean>>> {
+): CoroutineUseCase<EventEntity, Flow<JobState<Boolean>>> {
     override suspend fun invoke(param: EventEntity): Flow<JobState<Boolean>> = flow {
         emit(JobState.Loading())
         val result = eventRepository.insert(param.toDto())

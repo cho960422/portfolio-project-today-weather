@@ -109,6 +109,7 @@ dependencies {
 
     // optional - Jetpack Compose integration
     implementation("androidx.paging:paging-compose:3.3.0-alpha02")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0-alpha02")
 }
 
 // Allow references to generated code

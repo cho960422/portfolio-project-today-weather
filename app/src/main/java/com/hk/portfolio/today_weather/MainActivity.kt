@@ -9,7 +9,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
-import com.hk.portfolio.today_weather.domain.usecase.event.GetEventListUseCase
+import com.hk.portfolio.today_weather.domain.usecase.event.GetAllEventListUseCase
 import com.hk.portfolio.today_weather.presentation.screen.MainNavigationComponent
 import com.hk.portfolio.today_weather.ui.theme.TodayWeatherPortFolioTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
 
 @HiltViewModel
 class TestViewModel @Inject constructor(
-    private val getEventListUseCase: GetEventListUseCase
+    private val getEventListUseCase: GetAllEventListUseCase
 ): ViewModel() {
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun getList() {

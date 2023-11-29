@@ -9,8 +9,11 @@ import java.time.LocalDate
 
 @Dao
 interface EventDao {
+    @Query("SELECT * FROM event_location ORDER BY start_date DESC, update_at DESC LIMIT :start, :end")
+    suspend fun getEventList(start:Int, end:Int): List<EventLocation>
+
     @Query("SELECT * FROM event_location WHERE start_date <= :date AND end_date > :date")
-    suspend fun getEventList(date: LocalDate): List<EventLocation>
+    suspend fun getEventListAll(date: LocalDate): List<EventLocation>
 
     @Upsert
     suspend fun upsertEvent(event: EventLocation)

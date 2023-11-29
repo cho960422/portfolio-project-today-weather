@@ -14,6 +14,8 @@ data class EventLocation(
     @ColumnInfo("end_date") val endDate: LocalDate?,
     @ColumnInfo("alarm") val alarm: LocalDateTime?,
     @ColumnInfo("place_name") val placeName: String,
+    @ColumnInfo("place_detail") val placeDetail: String,
     @ColumnInfo("nx") val nx: Double,
     @ColumnInfo("ny") val ny: Double,
+    @ColumnInfo("update_at") val updateAt: LocalDateTime,
 )

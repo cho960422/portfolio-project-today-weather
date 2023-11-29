@@ -36,6 +36,6 @@ object LocalDateTimeConverter {
     @RequiresApi(Build.VERSION_CODES.O)
     @TypeConverter
     fun toDateString(date: LocalDate?): String? {
-        return date?.atStartOfDay().toString()
+        return date?.atStartOfDay()?.toString()
     }
 }
