@@ -27,6 +27,8 @@ object WeatherUtil {
         val rainArr = resultMap[WeatherConditionEnum.Rain]
         val snowArr = resultMap[WeatherConditionEnum.Snow]
         val rainSnow = resultMap[WeatherConditionEnum.RainOrSnow]
+        if (rainArr?.isEmpty() == true && snowArr?.isEmpty() == true && rainSnow?.isEmpty() == true)
+            return WeatherConditionEnum.Clean
 
         return weatherPerDate(rainSize = rainArr?.size?: 0, snowSize = snowArr?.size?: 0, rainSnowSize = rainSnow?.size?:0)
     }
