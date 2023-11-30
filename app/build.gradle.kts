@@ -93,9 +93,11 @@ dependencies {
     // Navigation For Compose
     val nav_version = "2.7.5"
     val material3_version = "1.1.2"
+    val material_version = "1.5.4"
 
     implementation("androidx.navigation:navigation-compose:$nav_version")
     implementation("androidx.compose.material3:material3:$material3_version")
+    implementation("androidx.compose.material:material:$material_version")
     // retrofit2 로그
     implementation("com.squareup.okhttp3:okhttp:4.9.2")
     implementation("com.squareup.okhttp3:logging-interceptor:3.14.9")
@@ -109,7 +111,10 @@ dependencies {
 
     // optional - Jetpack Compose integration
     implementation("androidx.paging:paging-compose:3.3.0-alpha02")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0-alpha02")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0-rc01")
+
+    implementation("androidx.core:core-splashscreen:1.1.0-alpha02")
+    implementation("com.google.accompanist:accompanist-swiperefresh:0.33.2-alpha")
 }
 
 // Allow references to generated code

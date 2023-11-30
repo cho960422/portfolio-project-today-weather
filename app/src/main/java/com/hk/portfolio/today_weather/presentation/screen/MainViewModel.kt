@@ -1,8 +1,7 @@
-package com.hk.portfolio.today_weather.presentation.screen.home.viewmodel
+package com.hk.portfolio.today_weather.presentation.screen
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hk.portfolio.today_weather.domain.entity.event.EventAndWeatherEntity
@@ -11,7 +10,6 @@ import com.hk.portfolio.today_weather.domain.usecase.weather.GetWeatherUseCase
 import com.hk.portfolio.today_weather.domain.usecase.weather.WriteWeatherUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -20,14 +18,11 @@ import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeScreenViewModel @Inject constructor(
+class MainViewModel @Inject constructor(
     private val getWeatherUseCase: GetWeatherUseCase,
     private val getAllEventListUseCase: GetAllEventListUseCase,
     private val writeWeatherUseCase: WriteWeatherUseCase
-): ViewModel(){
-    var isUpdating = mutableStateOf(false)
-        private set
-
+) : ViewModel() {
     companion object {
         @RequiresApi(Build.VERSION_CODES.O)
         val requestAvailableTime: List<Pair<LocalTime, LocalTime>> =
@@ -50,12 +45,9 @@ class HomeScreenViewModel @Inject constructor(
 
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun checkAndUpdateWeather() {
-        isUpdating.value = true
-        delay(1000)
         val baseDateTime = searchAvailableTime(LocalDateTime.now())
         val needUpdateEventList = filterNeedUpdateEvent(baseDateTime)
         updateWeather(needUpdateEventList, baseDateTime)
-        isUpdating.value = false
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

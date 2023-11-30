@@ -2,6 +2,7 @@ package com.hk.portfolio.today_weather.domain.repository
 
 import com.hk.portfolio.today_weather.domain.entity.weather.WeatherEntity
 import com.hk.portfolio.today_weather.domain.entity.weather.WeatherShortEntity
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 interface WeatherRepository {
@@ -16,7 +17,7 @@ interface WeatherRepository {
      *  @param count : 일기예보 패킷을 가져올 총 개수, 한 시간에 10개의 패킷이 필요하기 때문에 3일치의 데이터를 가져오려면 720으로 설정하는 것이 기본
      *  @return 패킷을 Entity로 전환한 목록을 반환, UseCase 에서 필요한 비즈니스 로직 실행
      */
-    suspend fun getWeather(nx: Double, ny: Double, baseDateTime: LocalDateTime, count: Int = 720): List<WeatherEntity>
+    suspend fun getWeather(nx: Double, ny: Double, baseDateTime: LocalDateTime, count: Int = 720,date: LocalDate): List<WeatherEntity>
 
     /**
      *  초단기예보를 가져오는 함수

@@ -84,10 +84,12 @@ enum class WeatherConditionEnum(val code:Int) {
     Snowdrop(7),
     Unknown(-100);
 
-    fun findByCode(code:Int): WeatherConditionEnum {
-        return WeatherConditionEnum.values().findLast {
-            it.code == code
-        }?: Unknown
+    companion object {
+        fun findByCode(code:Int): WeatherConditionEnum {
+            return WeatherConditionEnum.values().findLast {
+                it.code == code
+            }?: Unknown
+        }
     }
 }
 

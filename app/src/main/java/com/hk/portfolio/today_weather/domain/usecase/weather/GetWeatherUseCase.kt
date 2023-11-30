@@ -18,15 +18,14 @@ class GetWeatherUseCase @Inject constructor(
 
     @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun invoke(param: Request): WeatherConditionEntity {
-        val response = with(param){
+        val resultList = with(param) {
             weatherRepository.getWeather(
-                nx, ny, baseDateTime, count
+                nx, ny, baseDateTime, count, date
             )
         }
-        val filterArr = response.filter { it.dateTime.toLocalDate() == param.date }
 
-        val weatherCondition = WeatherUtil.exportWeatherCondition(filterArr)
-        val description = WeatherUtil.exportDescription(filterArr)
+        val weatherCondition = WeatherUtil.exportWeatherCondition(resultList)
+        val description = WeatherUtil.exportDescription(resultList)
         return WeatherConditionEntity(
             id = param.eventId,
             nx = param.nx,

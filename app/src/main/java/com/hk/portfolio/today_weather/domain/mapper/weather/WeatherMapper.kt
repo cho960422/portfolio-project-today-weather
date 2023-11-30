@@ -3,8 +3,13 @@ package com.hk.portfolio.today_weather.domain.mapper.weather
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.hk.portfolio.today_weather.core.WeatherCategoryEnum
+import com.hk.portfolio.today_weather.core.WeatherConditionEnum
 import com.hk.portfolio.today_weather.core.WeatherShortCategoryEnum
 import com.hk.portfolio.today_weather.data.dto.retrofit.weather.WeatherDto
+import com.hk.portfolio.today_weather.data.dto.room.EventAndWeatherData
+import com.hk.portfolio.today_weather.data.dto.room.WeatherData
+import com.hk.portfolio.today_weather.domain.entity.event.EventEntity
+import com.hk.portfolio.today_weather.domain.entity.weather.WeatherConditionEntity
 import com.hk.portfolio.today_weather.domain.entity.weather.WeatherEntity
 import com.hk.portfolio.today_weather.domain.entity.weather.WeatherShortEntity
 import java.text.SimpleDateFormat
@@ -39,3 +44,28 @@ fun WeatherDto.toShortEntity(): WeatherShortEntity {
     )
 }
 
+fun WeatherData.toEntity(): WeatherConditionEntity {
+    return WeatherConditionEntity(
+        id = id,
+        nx = nx,
+        ny = ny,
+        date = date,
+        baseDateTime = baseDateTime,
+        weatherCondition = WeatherConditionEnum.findByCode(weatherCondition),
+        description = description,
+        eventLocationId = eventLocationId
+    )
+}
+
+fun WeatherConditionEntity.toDto(): WeatherData {
+    return WeatherData(
+        id = id,
+        nx = nx,
+        ny = ny,
+        date = date,
+        baseDateTime = baseDateTime,
+        weatherCondition = weatherCondition.code,
+        description = description,
+        eventLocationId = eventLocationId
+    )
+}

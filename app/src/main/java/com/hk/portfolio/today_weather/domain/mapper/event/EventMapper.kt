@@ -2,9 +2,12 @@ package com.hk.portfolio.today_weather.domain.mapper.event
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import com.hk.portfolio.today_weather.data.dto.room.EventAndWeatherData
 import com.hk.portfolio.today_weather.data.dto.room.EventLocation
+import com.hk.portfolio.today_weather.domain.entity.event.EventAndWeatherEntity
 import com.hk.portfolio.today_weather.domain.entity.event.EventEntity
 import com.hk.portfolio.today_weather.domain.entity.event.PlaceEntity
+import com.hk.portfolio.today_weather.domain.mapper.weather.toEntity
 import java.time.LocalDateTime
 
 fun EventLocation.toEntity(): EventEntity {
@@ -34,5 +37,12 @@ fun EventEntity.toDto(): EventLocation {
         nx = place.nx,
         ny = place.ny,
         updateAt = updateAt
+    )
+}
+
+fun EventAndWeatherData.toEntity(): EventAndWeatherEntity {
+    return EventAndWeatherEntity(
+        eventEntity = this.eventLocation.toEntity(),
+        weatherEntity = this.weatherData?.toEntity()
     )
 }

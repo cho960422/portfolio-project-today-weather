@@ -7,6 +7,7 @@ import androidx.paging.PagingSource
 import com.hk.portfolio.today_weather.core.AppDatabase
 import com.hk.portfolio.today_weather.data.dto.room.EventLocation
 import com.hk.portfolio.today_weather.data.dto.room.EventLocationPagingSource
+import com.hk.portfolio.today_weather.domain.entity.event.EventAndWeatherEntity
 import com.hk.portfolio.today_weather.domain.entity.event.EventEntity
 import com.hk.portfolio.today_weather.domain.mapper.event.toEntity
 import com.hk.portfolio.today_weather.domain.repository.EventRepository
@@ -20,8 +21,9 @@ class EventRepositoryImpl @Inject constructor(
 ): EventRepository {
     private val dao = db.eventDao()
     @RequiresApi(Build.VERSION_CODES.O)
-    override suspend fun getEventListAll(startDate: LocalDate?): List<EventEntity> {
-        return dao.getEventListAll(startDate?: LocalDate.now()).map {
+    override suspend fun getEventListAll(startDate: LocalDate?): List<EventAndWeatherEntity> {
+        val nowDate = startDate?: LocalDate.now()
+        return dao.getEventListAll(startDate?: nowDate, nowDate.plusDays(1)).map {
             it.toEntity()
         }
     }

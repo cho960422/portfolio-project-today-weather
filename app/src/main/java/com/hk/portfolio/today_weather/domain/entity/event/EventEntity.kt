@@ -1,5 +1,6 @@
 package com.hk.portfolio.today_weather.domain.entity.event
 
+import com.hk.portfolio.today_weather.domain.entity.weather.WeatherConditionEntity
 import java.time.LocalDate
 import java.time.LocalDateTime
 

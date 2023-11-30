@@ -1,5 +1,7 @@
 package com.hk.portfolio.today_weather.presentation.screen
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
@@ -21,6 +23,7 @@ import com.hk.portfolio.today_weather.presentation.navigation.HomeNavigation
 import com.hk.portfolio.today_weather.presentation.navigation.Routers
 import com.hk.portfolio.today_weather.ui.component.BottomNavigationIcon
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainNavigationComponent() {

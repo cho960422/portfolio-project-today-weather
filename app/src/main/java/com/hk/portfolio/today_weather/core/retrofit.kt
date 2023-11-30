@@ -12,8 +12,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitBuilder {
     private const val kakaoUrl = "https://dapi.kakao.com/"
-    private const val weatherUrl = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/"
-    private const val tourUrl = "http://apis.data.go.kr/B551011/KorService1/"
+    private const val weatherUrl = "http://apis.data.go.kr/"
+    private const val tourUrl = "http://apis.data.go.kr/"
     private val client = OkHttpClient.Builder().addInterceptor(httpLoggingInterceptor()).build()
     private fun makeRetrofitBuilder(baseUrl: String): Retrofit {
         return Retrofit.Builder()

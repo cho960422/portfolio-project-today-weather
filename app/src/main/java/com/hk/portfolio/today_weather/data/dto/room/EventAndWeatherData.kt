@@ -9,5 +9,5 @@ data class EventAndWeatherData(
         parentColumn = "id",
         entityColumn = "event_location_id"
     )
-    val weatherData: WeatherData
+    val weatherData: WeatherData?
 )

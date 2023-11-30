@@ -15,5 +15,5 @@ data class WeatherData(
     @ColumnInfo("base_date") val baseDateTime: LocalDateTime,
     @ColumnInfo("weather_condition") val weatherCondition: Int,
     @ColumnInfo("description") val description: String,
-    val eventLocationId: String
+    @ColumnInfo("event_location_id") val eventLocationId: String
 )
