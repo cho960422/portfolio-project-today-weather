@@ -10,6 +10,11 @@ val eventWeatherCardContentStyle = TextStyle(
     color = Color.White
 )
 
+val eventWeatherCardTitleStyle = TextStyle(
+    fontWeight = FontWeight.SemiBold,
+    color = Color.White
+)
+
 val eventWeatherCardHeadStyle = TextStyle(
     fontWeight = FontWeight.Normal,
     color = Color.White

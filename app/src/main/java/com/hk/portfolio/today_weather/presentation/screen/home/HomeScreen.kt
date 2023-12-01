@@ -98,6 +98,10 @@ fun HomeScreen(
             Column(
                 modifier = Modifier.fillMaxWidth()
             ) {
+                Text(
+                    modifier = Modifier.padding(20.dp),
+                    text = "오늘 방문하시는 곳"
+                )
                 HorizontalPager(
                     state = pagerState,
                     modifier = Modifier.fillMaxWidth()
@@ -105,9 +109,11 @@ fun HomeScreen(
                     with(todayEventList.value[it]) {
                         EventAndWeatherCardView(
                             weatherCondition = weatherEntity?.weatherCondition,
+                            name = eventEntity.eventName,
                             addressDetail = eventEntity.place.detail,
                             addressName = eventEntity.place.addressName,
-                            content = weatherEntity?.description?:""
+                            content = weatherEntity?.description?:"",
+                            isUpdate = isUpdating
                         )
                     }
                 }
