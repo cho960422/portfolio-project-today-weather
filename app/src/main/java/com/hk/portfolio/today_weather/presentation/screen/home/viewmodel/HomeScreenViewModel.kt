@@ -7,11 +7,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hk.portfolio.today_weather.domain.entity.event.EventAndWeatherEntity
 import com.hk.portfolio.today_weather.domain.usecase.event.GetAllEventListUseCase
+import com.hk.portfolio.today_weather.domain.usecase.event.GetTodayEventUseCase
 import com.hk.portfolio.today_weather.domain.usecase.weather.GetWeatherUseCase
 import com.hk.portfolio.today_weather.domain.usecase.weather.WriteWeatherUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -23,10 +26,12 @@ import javax.inject.Inject
 class HomeScreenViewModel @Inject constructor(
     private val getWeatherUseCase: GetWeatherUseCase,
     private val getAllEventListUseCase: GetAllEventListUseCase,
-    private val writeWeatherUseCase: WriteWeatherUseCase
+    private val writeWeatherUseCase: WriteWeatherUseCase,
+    private val getTodayEventUseCase: GetTodayEventUseCase
 ): ViewModel(){
     var isUpdating = mutableStateOf(false)
         private set
+    val todayEventList = getTodayEventUseCase(Unit).stateIn(viewModelScope, SharingStarted.Eagerly, listOf())
 
     companion object {
         @RequiresApi(Build.VERSION_CODES.O)

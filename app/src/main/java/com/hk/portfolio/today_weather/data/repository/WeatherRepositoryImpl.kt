@@ -11,6 +11,7 @@ import com.hk.portfolio.today_weather.domain.mapper.weather.toEntity
 import com.hk.portfolio.today_weather.domain.repository.WeatherRepository
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.io.IOException
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -58,7 +59,13 @@ class WeatherRepositoryImpl @Inject constructor(
                 }?: listOf()
                 resultArr.addAll(list)
                 if (list.isEmpty()) break
-            } catch (e:Exception) {
+            }
+            catch (e: IOException) {
+                e.printStackTrace()
+                continue
+            }
+            catch (e:Exception) {
+                e.printStackTrace()
                 continue
             }
         }

@@ -2,6 +2,7 @@ package com.hk.portfolio.today_weather.data.repository
 
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.paging.PagingSource
 import com.hk.portfolio.today_weather.core.AppDatabase
@@ -13,6 +14,7 @@ import com.hk.portfolio.today_weather.domain.mapper.event.toEntity
 import com.hk.portfolio.today_weather.domain.repository.EventRepository
 import dagger.hilt.android.qualifiers.ActivityContext
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -37,6 +39,17 @@ class EventRepositoryImpl @Inject constructor(
             true
         } catch (e:Exception) {
             false
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun getTodayEvent(): Flow<List<EventAndWeatherEntity>> {
+        val dtoFlow = dao.getTodayEvent(LocalDate.now())
+        Log.d("dtoFlow :: ",dtoFlow.toString())
+        return dtoFlow.map {
+            it.map { dto ->
+                dto.toEntity()
+            }
         }
     }
 

@@ -2,10 +2,15 @@ package com.hk.portfolio.today_weather.presentation.screen.home
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
@@ -35,9 +40,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.hk.portfolio.today_weather.presentation.screen.home.viewmodel.HomeScreenViewModel
+import com.hk.portfolio.today_weather.ui.component.EventAndWeatherCardView
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(
@@ -56,6 +62,10 @@ fun HomeScreen(
     )
     val lifecycleOwner = LocalLifecycleOwner.current
     val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
+    val todayEventList = viewModel.todayEventList.collectAsState()
+    val pagerState = rememberPagerState {
+        todayEventList.value.size
+    }
 
     LaunchedEffect(Unit) {
         viewModel.checkAndUpdateWeather()
@@ -85,6 +95,24 @@ fun HomeScreen(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    with(todayEventList.value[it]) {
+                        EventAndWeatherCardView(
+                            weatherCondition = weatherEntity?.weatherCondition,
+                            addressDetail = eventEntity.place.detail,
+                            addressName = eventEntity.place.addressName,
+                            content = weatherEntity?.description?:""
+                        )
+                    }
+                }
+            }
+            
             FloatingActionButton(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
