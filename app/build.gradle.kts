@@ -115,6 +115,7 @@ dependencies {
 
     implementation("androidx.core:core-splashscreen:1.1.0-alpha02")
     implementation("com.google.accompanist:accompanist-swiperefresh:0.33.2-alpha")
+    implementation("com.google.android.gms:play-services-location:21.0.1")
 }
 
 // Allow references to generated code

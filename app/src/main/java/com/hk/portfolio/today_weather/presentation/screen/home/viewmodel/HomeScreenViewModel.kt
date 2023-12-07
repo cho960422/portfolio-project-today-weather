@@ -1,21 +1,42 @@
 package com.hk.portfolio.today_weather.presentation.screen.home.viewmodel
 
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.app.Application
+import android.location.Location
 import android.os.Build
+import android.os.Looper
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
+import com.google.android.gms.tasks.CancellationTokenSource
+import com.hk.portfolio.today_weather.core.JobState
+import com.hk.portfolio.today_weather.core.UiState
 import com.hk.portfolio.today_weather.domain.entity.event.EventAndWeatherEntity
+import com.hk.portfolio.today_weather.domain.entity.weather.WeatherConditionEntity
 import com.hk.portfolio.today_weather.domain.usecase.event.GetAllEventListUseCase
 import com.hk.portfolio.today_weather.domain.usecase.event.GetTodayEventUseCase
+import com.hk.portfolio.today_weather.domain.usecase.weather.GetCurrentWeatherUseCase
 import com.hk.portfolio.today_weather.domain.usecase.weather.GetWeatherUseCase
 import com.hk.portfolio.today_weather.domain.usecase.weather.WriteWeatherUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import okhttp3.internal.wait
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -27,11 +48,26 @@ class HomeScreenViewModel @Inject constructor(
     private val getWeatherUseCase: GetWeatherUseCase,
     private val getAllEventListUseCase: GetAllEventListUseCase,
     private val writeWeatherUseCase: WriteWeatherUseCase,
-    private val getTodayEventUseCase: GetTodayEventUseCase
-): ViewModel(){
+    private val getTodayEventUseCase: GetTodayEventUseCase,
+    private val getCurrentWeatherUseCase: GetCurrentWeatherUseCase,
+    private val application: Application
+): AndroidViewModel(application){
     var isUpdating = mutableStateOf(false)
         private set
     val todayEventList = getTodayEventUseCase(Unit).stateIn(viewModelScope, SharingStarted.Eagerly, listOf())
+    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(application.applicationContext)
+//    val locationCallback = object : LocationCallback() {
+//        @RequiresApi(Build.VERSION_CODES.O)
+//        override fun onLocationResult(locationResult: LocationResult) {
+//            val location = locationResult.locations.last()
+//            viewModelScope.launch {
+//            }
+//            Log.d("current Location :: ", "${location.latitude}, ${location.longitude}")
+//        }
+//    }
+    var currentWeather = mutableStateOf<UiState<WeatherConditionEntity>>(UiState(isLoading = true))
+        private set
+    val locationClient = LocationServices.getFusedLocationProviderClient(application)
 
     companion object {
         @RequiresApi(Build.VERSION_CODES.O)
@@ -57,6 +93,9 @@ class HomeScreenViewModel @Inject constructor(
     suspend fun checkAndUpdateWeather() {
         isUpdating.value = true
         delay(1000)
+        viewModelScope.launch {
+            getCurrentWeather()
+        }
         val baseDateTime = searchAvailableTime(LocalDateTime.now())
         val needUpdateEventList = filterNeedUpdateEvent(baseDateTime)
         updateWeather(needUpdateEventList, baseDateTime)
@@ -106,5 +145,66 @@ class HomeScreenViewModel @Inject constructor(
         }
 
         return now.withHour(timePair.first.hour).withMinute(0)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun getCurrentWeather() {
+        startLocationUpdate()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    @SuppressLint("MissingPermission")
+    private fun startLocationUpdate() {
+        viewModelScope.launch (Dispatchers.IO) {
+            locationClient.getCurrentLocation(
+                Priority.PRIORITY_HIGH_ACCURACY,
+                CancellationTokenSource().token
+            ).addOnSuccessListener { location ->
+                if (location != null) {
+                    viewModelScope.launch {
+                        updateCurrentWeather(
+                            location.latitude,
+                            location.longitude
+                        )
+                    }
+                } else {
+                    Log.d("location :: ", "Location is NULL")
+                    startLocationUpdate()
+                }
+            }.addOnFailureListener {
+                it.printStackTrace()
+                startLocationUpdate()
+            }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private suspend fun updateCurrentWeather(
+        nx: Double,
+        ny: Double
+    ) {
+        getCurrentWeatherUseCase(
+            GetCurrentWeatherUseCase.Request(
+                nx = nx,
+                ny = ny,
+                dateTime = LocalDateTime.now()
+            )
+        ).onEach {
+            when (it) {
+                is JobState.Loading -> {
+                    currentWeather.value = currentWeather.value.copy(
+                        isLoading = true
+                    )
+                }
+                is JobState.Success -> {
+                    currentWeather.value = currentWeather.value.copy(
+                        isLoading = false,
+                        data = it.data
+                    )
+                }
+
+                is JobState.Error -> {}
+            }
+        }.launchIn(viewModelScope)
     }
 }

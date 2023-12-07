@@ -6,5 +6,5 @@ data class WeatherNowDto(
     val category: String?= "",
     val nx:Double?= null,
     val ny:Double?= null,
-    val obsrValue: Int?= null
+    val obsrValue: Float?= null
 )

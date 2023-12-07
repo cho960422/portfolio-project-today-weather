@@ -73,11 +73,27 @@ class WeatherRepositoryImpl @Inject constructor(
         return resultArr.filter { it.dateTime.toLocalDate() == date }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun getShortWeather(
         nx: Double,
         ny: Double,
         baseDateTime: LocalDateTime
     ): List<WeatherShortEntity> {
-        TODO("Not yet implemented")
+        val requestDate = if (baseDateTime.minute < 41) {
+            baseDateTime.minusHours(1)
+        } else baseDateTime
+        val response = service.getWeatherNow(
+            nx = nx.toInt(),
+            ny = ny.toInt(),
+            date = DateTimeFormatter.ofPattern("yyyyMMdd").format(requestDate),
+            time = DateTimeFormatter.ofPattern("HHmm").format(requestDate)
+        )
+        return if (response.response?.header?.resultCode == "00") {
+            response.response.body?.items?.item?.map {
+                it.toEntity()
+            }?: listOf();
+        } else {
+            getShortWeather(nx, ny, requestDate.minusHours(1))
+        }
     }
 }

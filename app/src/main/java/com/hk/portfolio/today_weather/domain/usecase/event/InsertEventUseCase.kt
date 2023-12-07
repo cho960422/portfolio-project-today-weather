@@ -1,5 +1,7 @@
 package com.hk.portfolio.today_weather.domain.usecase.event
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.hk.portfolio.today_weather.core.JobState
 import com.hk.portfolio.today_weather.domain.entity.event.EventEntity
 import com.hk.portfolio.today_weather.domain.mapper.event.toDto
@@ -12,6 +14,7 @@ import javax.inject.Inject
 class InsertEventUseCase @Inject constructor(
     private val eventRepository: EventRepository
 ): CoroutineUseCase<EventEntity, Flow<JobState<Boolean>>> {
+    @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun invoke(param: EventEntity): Flow<JobState<Boolean>> = flow {
         emit(JobState.Loading())
         val result = eventRepository.insert(param.toDto())

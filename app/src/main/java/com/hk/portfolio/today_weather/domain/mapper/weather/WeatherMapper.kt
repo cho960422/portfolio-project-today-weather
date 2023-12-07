@@ -6,6 +6,7 @@ import com.hk.portfolio.today_weather.core.WeatherCategoryEnum
 import com.hk.portfolio.today_weather.core.WeatherConditionEnum
 import com.hk.portfolio.today_weather.core.WeatherShortCategoryEnum
 import com.hk.portfolio.today_weather.data.dto.retrofit.weather.WeatherDto
+import com.hk.portfolio.today_weather.data.dto.retrofit.weather.WeatherNowDto
 import com.hk.portfolio.today_weather.data.dto.room.EventAndWeatherData
 import com.hk.portfolio.today_weather.data.dto.room.WeatherData
 import com.hk.portfolio.today_weather.domain.entity.event.EventEntity
@@ -36,11 +37,10 @@ fun WeatherDto.toShortEntity(): WeatherShortEntity {
     val dateTime = LocalDateTime.parse(fcstDate + fcstTime, DateTimeFormatter.ofPattern("yyyyMMddHHmm"))
     return WeatherShortEntity(
         baseDateTime = baseDateTime,
-        dateTime = dateTime,
         category = WeatherShortCategoryEnum.findByCode(category),
         nx = nx ?: -1.0,
         ny = ny ?: -1.0,
-        valueForCategory = fcstValue?.toInt() ?: -1
+        valueForCategory = fcstValue?.toFloatOrNull() ?: -1f
     )
 }
 
@@ -67,5 +67,17 @@ fun WeatherConditionEntity.toDto(): WeatherData {
         weatherCondition = weatherCondition.code,
         description = description,
         eventLocationId = eventLocationId
+    )
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun WeatherNowDto.toEntity(): WeatherShortEntity {
+    val baseDateTime = LocalDateTime.parse(baseDate+baseTime, DateTimeFormatter.ofPattern("yyyyMMddHHmm"))
+    return WeatherShortEntity(
+        baseDateTime = baseDateTime,
+        category = WeatherShortCategoryEnum.findByCode(category),
+        nx = nx?: 55.0,
+        ny = ny?: 135.0,
+        valueForCategory = obsrValue?: -1f
     )
 }

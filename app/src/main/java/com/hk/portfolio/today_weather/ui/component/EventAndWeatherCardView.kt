@@ -94,22 +94,26 @@ fun EventAndWeatherCardView(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 20.dp),
-                    text = addressName,
-                    style = eventWeatherCardHeadStyle,
-                    fontSize = normalTextSize.dpToSp()
-                )
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 20.dp),
-                    text = addressDetail,
-                    style = eventWeatherCardHeadStyle,
-                    fontSize = smallTextSize.dpToSp()
-                )
+                if (addressName.isNotEmpty()) {
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 20.dp),
+                        text = addressName,
+                        style = eventWeatherCardHeadStyle,
+                        fontSize = normalTextSize.dpToSp()
+                    )
+                }
+                if (addressDetail.isNotEmpty()) {
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 20.dp),
+                        text = addressDetail,
+                        style = eventWeatherCardHeadStyle,
+                        fontSize = smallTextSize.dpToSp()
+                    )
+                }
                 Box(modifier = Modifier.fillMaxSize()
                     .padding(horizontal = 25.dp)
                 ) {

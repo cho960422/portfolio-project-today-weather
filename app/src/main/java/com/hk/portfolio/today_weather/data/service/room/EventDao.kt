@@ -23,6 +23,6 @@ interface EventDao {
     suspend fun upsertEvent(event: EventLocation)
 
     @Transaction
-    @Query("SELECT * FROM event_location WHERE start_date <= :date AND (end_date >= :date OR end_date is NULL)")
+    @Query("SELECT * FROM event_location WHERE start_date = :date OR (start_date <= :date AND end_date >= :date)")
     fun getTodayEvent(date: LocalDate): Flow<List<EventAndWeatherData>>
 }

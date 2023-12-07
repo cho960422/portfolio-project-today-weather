@@ -5,9 +5,8 @@ import java.time.LocalDateTime
 
 data class WeatherShortEntity(
     val baseDateTime: LocalDateTime,
-    val dateTime: LocalDateTime,
     val category: WeatherShortCategoryEnum,
     val nx: Double,
     val ny: Double,
-    val valueForCategory: Int
+    val valueForCategory: Float
 )

@@ -3,6 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Recommended for Android 9 (API level 28) and lower. -->
+    <!-- Required for Android 10 (API level 29) and higher. -->
+
+    <!-- Always include this permission -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <!-- Include only if your app benefits from precise location access. -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -16,6 +24,14 @@
         android:name=".BaseApplication"
         android:networkSecurityConfig="@xml/network_security_config"
         tools:targetApi="31">
+        <!-- Recommended for Android 9 (API level 28) and lower. -->
+        <!-- Required for Android 10 (API level 29) and higher. -->
+        <service
+            android:name=".BaseApplication"
+            android:foregroundServiceType="location">
+        <!-- Any inner elements would go here. -->
+        </service>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
