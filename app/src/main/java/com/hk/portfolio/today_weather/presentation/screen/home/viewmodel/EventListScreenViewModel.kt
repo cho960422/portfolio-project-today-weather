@@ -7,6 +7,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.hk.portfolio.today_weather.data.repository.EventRepositoryImpl
+import com.hk.portfolio.today_weather.domain.entity.event.EventAndWeatherEntity
 import com.hk.portfolio.today_weather.domain.entity.event.EventEntity
 import com.hk.portfolio.today_weather.domain.usecase.event.GetEventPageSourceUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,7 +18,7 @@ import javax.inject.Inject
 class EventListScreenViewModel @Inject constructor(
     private val getEventPageSourceUseCase: GetEventPageSourceUseCase
 ) : ViewModel() {
-    val items: Flow<PagingData<EventEntity>> = Pager(
+    val items: Flow<PagingData<EventAndWeatherEntity>> = Pager(
         config = PagingConfig(pageSize = 30, enablePlaceholders = false),
         pagingSourceFactory = {
             getEventPageSourceUseCase(null)

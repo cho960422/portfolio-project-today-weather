@@ -30,7 +30,7 @@ class EventRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getEventPagingSource(): PagingSource<Int, EventEntity> =
+    override fun getEventPagingSource(): PagingSource<Int, EventAndWeatherEntity> =
         EventLocationPagingSource(db)
 
     override suspend fun insert(eventLocation: EventLocation): Boolean {

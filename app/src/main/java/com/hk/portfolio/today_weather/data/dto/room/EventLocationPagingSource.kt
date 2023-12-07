@@ -5,6 +5,7 @@ import androidx.annotation.RequiresApi
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.hk.portfolio.today_weather.core.AppDatabase
+import com.hk.portfolio.today_weather.domain.entity.event.EventAndWeatherEntity
 import com.hk.portfolio.today_weather.domain.entity.event.EventEntity
 import com.hk.portfolio.today_weather.domain.mapper.event.toEntity
 import java.time.LocalDate
@@ -15,7 +16,7 @@ import kotlin.math.max
 class EventLocationPagingSource @Inject constructor(
     // Room에 접근할 수 있는 구현체를 주입
     private val db: AppDatabase
-) : PagingSource<Int, EventEntity>() {
+) : PagingSource<Int, EventAndWeatherEntity>() {
     // 실질적인 쿼리를 날릴 수 있는 Dao
     val dao = db.eventDao()
     // 시작점 인덱스 정의
@@ -27,13 +28,13 @@ class EventLocationPagingSource @Inject constructor(
     private fun ensureValidKey(key: Int) = max(START_KEY, key)
 
     // 새로고침할 때의 refresh 또는 읽을 수 없는 invalidate가 호출되었을 때 키를 재정의하는 함수
-    override fun getRefreshKey(state: PagingState<Int, EventEntity>): Int? {
+    override fun getRefreshKey(state: PagingState<Int, EventAndWeatherEntity>): Int? {
         val key = state.anchorPosition?: return null
         return ensureValidKey(key - (state.config.pageSize / 2))
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, EventEntity> {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, EventAndWeatherEntity> {
         // 키는 nullable한 타입이기 때문에 키가 없을 경우 최초로 페이지네이션을 시작할 때의 값을 넣어준다.
         val start: Int = params.key ?: START_KEY
         // limit의 마지막 값을 만들어준다.

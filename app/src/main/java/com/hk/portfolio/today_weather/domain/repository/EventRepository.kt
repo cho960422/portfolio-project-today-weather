@@ -9,7 +9,7 @@ import java.time.LocalDate
 
 interface EventRepository {
     suspend fun getEventListAll(startDate: LocalDate?):List<EventAndWeatherEntity>
-    fun getEventPagingSource(): PagingSource<Int, EventEntity>
+    fun getEventPagingSource(): PagingSource<Int, EventAndWeatherEntity>
     suspend fun insert(eventLocation: EventLocation): Boolean
     fun getTodayEvent(): Flow<List<EventAndWeatherEntity>>
 }

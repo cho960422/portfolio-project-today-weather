@@ -29,4 +29,8 @@ class SearchHistoryRepositoryImpl @Inject constructor(
     ): List<SearchHistoryData> {
         return dao.getHistoryListFlow(category = category.category, query = "%${query}%")
     }
+
+    override suspend fun deleteHistory(data: SearchHistoryData) {
+        dao.deleteHistory(data)
+    }
 }

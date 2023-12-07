@@ -162,7 +162,12 @@ fun SearchLocationScreen(
                     items(
                         items = historyList
                     ) {
-                        SearchHistoryCell(it) { query ->
+                        SearchHistoryCell(
+                            item = it,
+                            onDeleteClicked = { history ->
+                                viewModel.deleteHistory(history, searchText.value)
+                            }
+                        ) { query ->
                             active.value = false
                             searchText.value = query
                             viewModel.onSearch(query)

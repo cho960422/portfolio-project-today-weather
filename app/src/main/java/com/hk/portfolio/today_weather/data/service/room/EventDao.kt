@@ -12,8 +12,9 @@ import java.time.LocalDate
 
 @Dao
 interface EventDao {
+    @Transaction
     @Query("SELECT * FROM event_location ORDER BY start_date DESC, update_at DESC LIMIT :start, :end")
-    suspend fun getEventList(start:Int, end:Int): List<EventLocation>
+    suspend fun getEventList(start:Int, end:Int): List<EventAndWeatherData>
 
     @Transaction
     @Query("SELECT * FROM event_location WHERE (start_date <= :date AND end_date > :date) OR ( start_date >= :date AND start_date <= :limitDate)")

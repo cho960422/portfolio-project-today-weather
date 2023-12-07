@@ -5,6 +5,8 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -87,20 +89,22 @@ fun EventListScreen(
                     ) {
                         itemsIndexed(list.itemSnapshotList) { index, item ->
                             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-                            val startDateStr = formatter.format(item?.startDate)
-                            val endDateStr = if (item?.endDate == null) "" else " ~ ${
-                                formatter.format(item.endDate)
+                            val startDateStr = formatter.format(item?.eventEntity?.startDate)
+                            val endDateStr = if (item?.eventEntity?.endDate == null) "" else " ~ ${
+                                formatter.format(item.eventEntity?.endDate)
                             }"
                             ListItem(
                                 headlineContent = {
-                                    Text(text = item?.eventName ?: "알 수 없는 일정")
+                                    Text(text = item?.eventEntity?.eventName ?: "알 수 없는 일정")
                                 },
                                 supportingContent = {
                                     Column {
-                                        Text(text = item?.place?.addressName ?: "")
-                                        if (item?.place?.detail?.isNotEmpty() == true) {
-                                            Text(text = item.place.detail ?: "")
+                                        Text(text = item?.eventEntity?.place?.addressName ?: "")
+                                        if (item?.eventEntity?.place?.detail?.isNotEmpty() == true) {
+                                            Text(text = item.eventEntity.place.detail ?: "")
                                         }
+                                        Spacer(modifier = Modifier.height(10.dp))
+                                        Text(text = item?.weatherEntity?.description?:"일기예보가 없어요.")
                                     }
                                 },
                                 overlineContent = {

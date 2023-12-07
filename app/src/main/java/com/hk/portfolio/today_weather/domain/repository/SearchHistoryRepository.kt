@@ -7,4 +7,5 @@ import kotlinx.coroutines.flow.Flow
 interface SearchHistoryRepository {
     suspend fun insertHistory(query:String, category:Int)
     suspend fun getHistoryList(category: SearchCategoryEnum, query:String): List<SearchHistoryData>
+    suspend fun deleteHistory(data: SearchHistoryData)
 }

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -20,16 +21,28 @@ import com.hk.portfolio.today_weather.data.dto.room.SearchHistoryData
 @Composable
 fun SearchHistoryCell(
     item: SearchHistoryData,
+    onDeleteClicked:(SearchHistoryData) -> Unit,
     onClicked: (String) -> Unit
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .padding(16.dp)
             .clickable { onClicked(item.query) },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Icon(imageVector = Icons.Filled.Refresh, contentDescription = "")
-        Text(text = item.query)
+        Text(
+            modifier = Modifier.weight(1f),
+            text = item.query
+        )
+        Icon(
+            modifier = Modifier.clickable {
+                onDeleteClicked(item)
+            },
+            imageVector = Icons.Default.Delete,
+            contentDescription = ""
+        )
     }
 }

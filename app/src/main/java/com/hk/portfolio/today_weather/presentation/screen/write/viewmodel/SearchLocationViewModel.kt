@@ -16,6 +16,7 @@ import com.hk.portfolio.today_weather.domain.entity.GetHistoryRequest
 import com.hk.portfolio.today_weather.domain.entity.InsertHistoryRequest
 import com.hk.portfolio.today_weather.domain.entity.kakao.KakaoLocationEntity
 import com.hk.portfolio.today_weather.domain.usecase.kakao.SearchLocationUseCase
+import com.hk.portfolio.today_weather.domain.usecase.search_history.DeleteHistoryUseCase
 import com.hk.portfolio.today_weather.domain.usecase.search_history.GetHistoryListUseCase
 import com.hk.portfolio.today_weather.domain.usecase.search_history.InsertHistoryUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -35,7 +36,8 @@ import javax.inject.Inject
 class SearchLocationViewModel @Inject constructor(
     private val insertHistoryUseCase: InsertHistoryUseCase,
     private val getHistoryListUseCase: GetHistoryListUseCase,
-    private val searchLocationUseCase: SearchLocationUseCase
+    private val searchLocationUseCase: SearchLocationUseCase,
+    private val deleteHistoryUseCase: DeleteHistoryUseCase
 ): ViewModel() {
     private val category = SearchCategoryEnum.AddressSearch
     var historyList = mutableStateOf<List<SearchHistoryData>>(listOf())
@@ -122,5 +124,12 @@ class SearchLocationViewModel @Inject constructor(
                 }
             }
         }.launchIn(viewModelScope)
+    }
+
+    fun deleteHistory(data: SearchHistoryData, query: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            deleteHistoryUseCase(data)
+            getHistoryList(query)
+        }
     }
 }
