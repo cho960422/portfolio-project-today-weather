@@ -12,4 +12,5 @@ interface EventRepository {
     fun getEventPagingSource(): PagingSource<Int, EventAndWeatherEntity>
     suspend fun insert(eventLocation: EventLocation): Boolean
     fun getTodayEvent(): Flow<List<EventAndWeatherEntity>>
+    suspend fun deleteEvent(eventEntity: EventAndWeatherEntity)
 }

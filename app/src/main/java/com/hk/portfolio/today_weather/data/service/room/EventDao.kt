@@ -1,6 +1,7 @@
 package com.hk.portfolio.today_weather.data.service.room
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
@@ -26,4 +27,7 @@ interface EventDao {
     @Transaction
     @Query("SELECT * FROM event_location WHERE start_date = :date OR (start_date <= :date AND end_date >= :date)")
     fun getTodayEvent(date: LocalDate): Flow<List<EventAndWeatherData>>
+
+    @Delete
+    suspend fun deleteEventAndWeather(data: EventLocation)
 }

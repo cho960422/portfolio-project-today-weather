@@ -7,6 +7,7 @@ import com.hk.portfolio.today_weather.data.dto.room.EventLocation
 import com.hk.portfolio.today_weather.domain.entity.event.EventAndWeatherEntity
 import com.hk.portfolio.today_weather.domain.entity.event.EventEntity
 import com.hk.portfolio.today_weather.domain.entity.event.PlaceEntity
+import com.hk.portfolio.today_weather.domain.mapper.weather.toDto
 import com.hk.portfolio.today_weather.domain.mapper.weather.toEntity
 import java.time.LocalDateTime
 
@@ -44,5 +45,13 @@ fun EventAndWeatherData.toEntity(): EventAndWeatherEntity {
     return EventAndWeatherEntity(
         eventEntity = this.eventLocation.toEntity(),
         weatherEntity = this.weatherData?.toEntity()
+    )
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun EventAndWeatherEntity.toDto(): EventAndWeatherData {
+    return EventAndWeatherData(
+        eventLocation = this.eventEntity.toDto(),
+        weatherData = this.weatherEntity?.toDto()
     )
 }
