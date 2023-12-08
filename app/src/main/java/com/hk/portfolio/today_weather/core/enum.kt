@@ -114,3 +114,26 @@ enum class SearchCategoryEnum(
 ) {
     AddressSearch(1);
 }
+
+enum class TourContentTypeEnum(
+    val category: Int?,
+    val description: String
+) {
+    Tourism(12, "관광지"),
+    Culture(14, "문화시설"),
+    Festival(15, "축제공연행사"),
+    TourCourse(25, "여행코스"),
+    LeisureSports(28, "레포츠"),
+    Hotel(32, "숙박"),
+    Shopping(38, "쇼핑"),
+    Restaurant(39, "음식점"),
+    Unknown(null, "알 수 없음");
+
+    companion object {
+        fun findByCode(category: Int?): TourContentTypeEnum {
+            return TourContentTypeEnum.values().findLast {
+                it.category == category
+            }?: Unknown
+        }
+    }
+}

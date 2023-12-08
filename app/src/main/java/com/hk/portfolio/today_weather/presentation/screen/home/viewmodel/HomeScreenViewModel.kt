@@ -12,6 +12,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
@@ -19,11 +23,19 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.hk.portfolio.today_weather.core.JobState
+import com.hk.portfolio.today_weather.core.SearchCategoryEnum
+import com.hk.portfolio.today_weather.core.TourContentTypeEnum
 import com.hk.portfolio.today_weather.core.UiState
+import com.hk.portfolio.today_weather.core.util.WeatherUtil
+import com.hk.portfolio.today_weather.core.util.WeatherUtil.TO_GPS
+import com.hk.portfolio.today_weather.data.dto.retrofit.tour.TourListPagingSource
 import com.hk.portfolio.today_weather.domain.entity.event.EventAndWeatherEntity
+import com.hk.portfolio.today_weather.domain.entity.event.EventEntity
+import com.hk.portfolio.today_weather.domain.entity.tour.TourEntity
 import com.hk.portfolio.today_weather.domain.entity.weather.WeatherConditionEntity
 import com.hk.portfolio.today_weather.domain.usecase.event.GetAllEventListUseCase
 import com.hk.portfolio.today_weather.domain.usecase.event.GetTodayEventUseCase
+import com.hk.portfolio.today_weather.domain.usecase.tour.GetTourListUseCase
 import com.hk.portfolio.today_weather.domain.usecase.weather.GetCurrentWeatherUseCase
 import com.hk.portfolio.today_weather.domain.usecase.weather.GetWeatherUseCase
 import com.hk.portfolio.today_weather.domain.usecase.weather.WriteWeatherUseCase
@@ -31,6 +43,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -50,6 +63,7 @@ class HomeScreenViewModel @Inject constructor(
     private val writeWeatherUseCase: WriteWeatherUseCase,
     private val getTodayEventUseCase: GetTodayEventUseCase,
     private val getCurrentWeatherUseCase: GetCurrentWeatherUseCase,
+    private val getTourListUseCase: GetTourListUseCase,
     private val application: Application
 ): AndroidViewModel(application){
     var isUpdating = mutableStateOf(false)
@@ -68,6 +82,8 @@ class HomeScreenViewModel @Inject constructor(
     var currentWeather = mutableStateOf<UiState<WeatherConditionEntity>>(UiState(isLoading = true))
         private set
     val locationClient = LocationServices.getFusedLocationProviderClient(application)
+    var tourList: Flow<PagingData<TourEntity>>? = null
+        private set
 
     companion object {
         @RequiresApi(Build.VERSION_CODES.O)
@@ -206,5 +222,23 @@ class HomeScreenViewModel @Inject constructor(
                 is JobState.Error -> {}
             }
         }.launchIn(viewModelScope)
+    }
+
+    fun getTourList(event: EventAndWeatherEntity, category: TourContentTypeEnum?) {
+        val latlng = WeatherUtil.convertGRID_GPS(TO_GPS, event.eventEntity.place.nx, event.eventEntity.place.ny)
+        tourList = Pager(
+            config = PagingConfig(
+                pageSize = 10
+            ),
+            initialKey = TourListPagingSource.Request(
+                latlng = latlng,
+                page = 1
+            ),
+            pagingSourceFactory = {
+                getTourListUseCase(Unit)
+            }
+        )
+            .flow
+            .cachedIn(viewModelScope)
     }
 }

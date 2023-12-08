@@ -5,12 +5,15 @@ import com.hk.portfolio.today_weather.core.RetrofitBuilder
 import com.hk.portfolio.today_weather.data.repository.EventRepositoryImpl
 import com.hk.portfolio.today_weather.data.repository.KakaoLocationRepositoryImpl
 import com.hk.portfolio.today_weather.data.repository.SearchHistoryRepositoryImpl
+import com.hk.portfolio.today_weather.data.repository.TourRepositoryImpl
 import com.hk.portfolio.today_weather.data.repository.WeatherRepositoryImpl
 import com.hk.portfolio.today_weather.data.service.retrofit.KakaoService
+import com.hk.portfolio.today_weather.data.service.retrofit.TourService
 import com.hk.portfolio.today_weather.data.service.retrofit.WeatherService
 import com.hk.portfolio.today_weather.domain.repository.EventRepository
 import com.hk.portfolio.today_weather.domain.repository.KakaoLocationRepository
 import com.hk.portfolio.today_weather.domain.repository.SearchHistoryRepository
+import com.hk.portfolio.today_weather.domain.repository.TourRepository
 import com.hk.portfolio.today_weather.domain.repository.WeatherRepository
 import dagger.Module
 import dagger.Provides
@@ -41,4 +44,8 @@ object RepositoryModule {
     @Singleton
     fun provideKakaoRepository(): KakaoLocationRepository =
         KakaoLocationRepositoryImpl(kakaoService = RetrofitBuilder.kakaoApi)
+
+    @Provides
+    @Singleton
+    fun provideTourRepository(service: TourService): TourRepository = TourRepositoryImpl(tourService = service)
 }

@@ -9,10 +9,13 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -24,9 +27,11 @@ import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.Card
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
 import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.Text
@@ -43,7 +48,9 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.hk.portfolio.today_weather.core.TourContentTypeEnum
 import com.hk.portfolio.today_weather.core.WeatherConditionEnum
 import com.hk.portfolio.today_weather.presentation.screen.home.viewmodel.HomeScreenViewModel
 import com.hk.portfolio.today_weather.ui.component.EventAndWeatherCardView
@@ -69,6 +76,9 @@ fun HomeScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
     val todayEventList = viewModel.todayEventList.collectAsState()
+    val categoryState = remember {
+        mutableStateOf<TourContentTypeEnum?>(null)
+    }
     val pagerState = rememberPagerState {
         todayEventList.value.size
     }
@@ -92,9 +102,16 @@ fun HomeScreen(
                 }
             }
         })
+    val tourList = viewModel.tourList?.collectAsLazyPagingItems()
+    val tourCnt = tourList?.itemCount?: 0
 
     LaunchedEffect(Unit) {
         viewModel.checkAndUpdateWeather()
+    }
+    if (todayEventList.value.isNotEmpty()) {
+        LaunchedEffect(pagerState.currentPage) {
+            viewModel.getTourList(todayEventList.value[pagerState.currentPage], category = categoryState.value)
+        }
     }
 
     LaunchedEffect(lifecycleState) {
@@ -169,6 +186,32 @@ fun HomeScreen(
                             content = weatherEntity?.description ?: "",
                             isUpdate = isUpdating
                         )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(30.dp))
+
+                Text(
+                    modifier = Modifier.padding(20.dp),
+                    text = "방문 지역 주변정보"
+                )
+                if (tourCnt == 0) {
+
+                } else {
+                    LazyRow(
+                        modifier = Modifier.fillMaxWidth()
+                    ){
+                        items(
+                            count = tourCnt
+                        ) { idx ->
+                            OutlinedCard (
+                                modifier = Modifier
+                                    .width(100.dp)
+                                    .aspectRatio(2f)
+                            ){
+                                Text(text = tourList!![idx]?.name?:"")
+                            }
+                        }
                     }
                 }
             }
