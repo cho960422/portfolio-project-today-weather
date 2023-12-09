@@ -10,6 +10,7 @@ import com.hk.portfolio.today_weather.domain.usecase.weather.GetWeatherUseCase
 import com.hk.portfolio.today_weather.domain.usecase.weather.WriteWeatherUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -66,9 +67,12 @@ class MainViewModel @Inject constructor(
                     )
                 }
             )
-            viewModelScope.launch(Dispatchers.IO) {
-                writeWeatherUseCase(weatherData)
+            weatherData?.let {
+                viewModelScope.launch(Dispatchers.IO) {
+                    writeWeatherUseCase(it)
+                }
             }
+            delay(300)
         }
     }
 

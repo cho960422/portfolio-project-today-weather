@@ -25,8 +25,8 @@ class WeatherRepositoryImpl @Inject constructor(
 
     @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun getWeather(
-        nx: Double,
-        ny: Double,
+        nx: Int,
+        ny: Int,
         baseDateTime: LocalDateTime,
         count: Int,
         date: LocalDate

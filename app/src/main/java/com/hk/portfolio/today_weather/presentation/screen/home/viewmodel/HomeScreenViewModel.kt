@@ -1,36 +1,29 @@
 package com.hk.portfolio.today_weather.presentation.screen.home.viewmodel
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.Application
-import android.location.Location
 import android.os.Build
-import android.os.Looper
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.mutableStateOf
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.hk.portfolio.today_weather.core.JobState
-import com.hk.portfolio.today_weather.core.SearchCategoryEnum
 import com.hk.portfolio.today_weather.core.TourContentTypeEnum
 import com.hk.portfolio.today_weather.core.UiState
 import com.hk.portfolio.today_weather.core.util.WeatherUtil
 import com.hk.portfolio.today_weather.core.util.WeatherUtil.TO_GPS
-import com.hk.portfolio.today_weather.data.dto.retrofit.tour.TourListPagingSource
+import com.hk.portfolio.today_weather.dataStore
 import com.hk.portfolio.today_weather.domain.entity.event.EventAndWeatherEntity
-import com.hk.portfolio.today_weather.domain.entity.event.EventEntity
 import com.hk.portfolio.today_weather.domain.entity.tour.TourEntity
 import com.hk.portfolio.today_weather.domain.entity.weather.WeatherConditionEntity
 import com.hk.portfolio.today_weather.domain.usecase.event.GetAllEventListUseCase
@@ -41,15 +34,14 @@ import com.hk.portfolio.today_weather.domain.usecase.weather.GetWeatherUseCase
 import com.hk.portfolio.today_weather.domain.usecase.weather.WriteWeatherUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import okhttp3.internal.wait
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -84,6 +76,12 @@ class HomeScreenViewModel @Inject constructor(
     val locationClient = LocationServices.getFusedLocationProviderClient(application)
     var tourList: Flow<PagingData<TourEntity>>? = null
         private set
+    private val CATEGORY_KEY = intPreferencesKey("category")
+    val category: Flow<TourContentTypeEnum?> = application.baseContext.dataStore.data.map { preferences ->
+        TourContentTypeEnum.findByCode(preferences[CATEGORY_KEY])
+    }
+//    var category = mutableStateOf<TourContentTypeEnum?>(null)
+//        private set
 
     companion object {
         @RequiresApi(Build.VERSION_CODES.O)
@@ -134,9 +132,12 @@ class HomeScreenViewModel @Inject constructor(
                     )
                 }
             )
-            viewModelScope.launch(Dispatchers.IO) {
-                writeWeatherUseCase(weatherData)
+            weatherData?.let {
+                viewModelScope.launch(Dispatchers.IO) {
+                    writeWeatherUseCase(it)
+                }
             }
+            delay(500)
         }
     }
 
@@ -225,20 +226,26 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     fun getTourList(event: EventAndWeatherEntity, category: TourContentTypeEnum?) {
+        tourList = null
         val latlng = WeatherUtil.convertGRID_GPS(TO_GPS, event.eventEntity.place.nx, event.eventEntity.place.ny)
         tourList = Pager(
             config = PagingConfig(
-                pageSize = 10
+                pageSize = 20
             ),
-            initialKey = TourListPagingSource.Request(
-                latlng = latlng,
-                page = 1
-            ),
+            initialKey = 1,
             pagingSourceFactory = {
-                getTourListUseCase(Unit)
+                getTourListUseCase(Pair(latlng, if (category == null || category == TourContentTypeEnum.Unknown) null else category))
             }
         )
             .flow
             .cachedIn(viewModelScope)
+    }
+
+    fun selectTourCategory(inputCategory: TourContentTypeEnum?) {
+        viewModelScope.launch {
+            application.baseContext.dataStore.edit { settings ->
+                settings[CATEGORY_KEY] = inputCategory?.category ?: TourContentTypeEnum.Unknown.category
+            }
+        }
     }
 }

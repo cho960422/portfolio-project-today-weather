@@ -116,9 +116,10 @@ enum class SearchCategoryEnum(
 }
 
 enum class TourContentTypeEnum(
-    val category: Int?,
+    val category: Int,
     val description: String
 ) {
+    Unknown(-100, "전체"),
     Tourism(12, "관광지"),
     Culture(14, "문화시설"),
     Festival(15, "축제공연행사"),
@@ -126,8 +127,7 @@ enum class TourContentTypeEnum(
     LeisureSports(28, "레포츠"),
     Hotel(32, "숙박"),
     Shopping(38, "쇼핑"),
-    Restaurant(39, "음식점"),
-    Unknown(null, "알 수 없음");
+    Restaurant(39, "음식점");
 
     companion object {
         fun findByCode(category: Int?): TourContentTypeEnum {

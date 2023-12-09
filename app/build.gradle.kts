@@ -116,6 +116,9 @@ dependencies {
     implementation("androidx.core:core-splashscreen:1.1.0-alpha02")
     implementation("com.google.accompanist:accompanist-swiperefresh:0.33.2-alpha")
     implementation("com.google.android.gms:play-services-location:21.0.1")
+    // image coil
+    implementation("io.coil-kt:coil-compose:2.5.0")
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
 }
 
 // Allow references to generated code

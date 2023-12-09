@@ -8,13 +8,17 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
 
 object RetrofitBuilder {
     private const val kakaoUrl = "https://dapi.kakao.com/"
     private const val weatherUrl = "http://apis.data.go.kr/"
     private const val tourUrl = "http://apis.data.go.kr/"
-    private val client = OkHttpClient.Builder().addInterceptor(httpLoggingInterceptor()).build()
+    private val client = OkHttpClient.Builder()
+        .connectTimeout(1, TimeUnit.MINUTES)
+        .addInterceptor(httpLoggingInterceptor())
+        .build()
     private fun makeRetrofitBuilder(baseUrl: String): Retrofit {
         return Retrofit.Builder()
             .baseUrl(baseUrl)
