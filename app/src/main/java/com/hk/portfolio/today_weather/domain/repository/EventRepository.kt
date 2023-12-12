@@ -13,4 +13,5 @@ interface EventRepository {
     suspend fun insert(eventLocation: EventLocation): Boolean
     fun getTodayEvent(): Flow<List<EventAndWeatherEntity>>
     suspend fun deleteEvent(eventEntity: EventAndWeatherEntity)
+    suspend fun getEvent(id:String): EventEntity
 }

@@ -9,6 +9,7 @@ import com.hk.portfolio.today_weather.core.AppDatabase
 import com.hk.portfolio.today_weather.data.dto.room.EventLocation
 import com.hk.portfolio.today_weather.data.dto.room.EventLocationPagingSource
 import com.hk.portfolio.today_weather.domain.entity.event.EventAndWeatherEntity
+import com.hk.portfolio.today_weather.domain.entity.event.EventEntity
 import com.hk.portfolio.today_weather.domain.mapper.event.toDto
 import com.hk.portfolio.today_weather.domain.mapper.event.toEntity
 import com.hk.portfolio.today_weather.domain.repository.EventRepository
@@ -60,6 +61,10 @@ class EventRepositoryImpl @Inject constructor(
         val dto = eventEntity.toDto()
         dto.weatherData?.let { weatherDao.deleteWeatherData(it) }
         dao.deleteEventAndWeather(dto.eventLocation)
+    }
+
+    override suspend fun getEvent(id: String): EventEntity {
+        return dao.getEvent(id).toEntity()
     }
 
 

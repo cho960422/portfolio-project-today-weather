@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -45,6 +47,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.hk.portfolio.today_weather.domain.entity.event.EventAndWeatherEntity
+import com.hk.portfolio.today_weather.domain.entity.event.EventEntity
 import com.hk.portfolio.today_weather.presentation.screen.home.viewmodel.EventListScreenViewModel
 import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
@@ -53,7 +56,8 @@ import java.time.format.DateTimeFormatter
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun EventListScreen(
-    onEventClicked:(EventAndWeatherEntity) -> Unit
+    onEventClicked: (EventAndWeatherEntity) -> Unit,
+    onEditClicked: (EventEntity) -> Unit
 ) {
     val viewModel = hiltViewModel<EventListScreenViewModel>()
     val list = viewModel.items.collectAsLazyPagingItems()
@@ -152,7 +156,8 @@ fun EventListScreen(
         }
     ) { paddingValue ->
         Box(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .padding(paddingValue)
         ) {
             LazyColumn(
@@ -195,12 +200,19 @@ fun EventListScreen(
                         },
                         trailingContent = {
                             if (editModeState.value) {
-                                Box(modifier = Modifier.fillMaxHeight()) {
+                                Row {
                                     Icon(
                                         modifier = Modifier.clickable {
-                                            deleteState.value = list[index]
-                                        }
-                                            .align(Alignment.Center),
+                                            onEditClicked(list[index]?.eventEntity!!)
+                                        },
+                                        imageVector = Icons.Default.Edit,
+                                        contentDescription = null
+                                    )
+                                    Icon(
+                                        modifier = Modifier
+                                            .clickable {
+                                                deleteState.value = list[index]
+                                            },
                                         imageVector = Icons.Default.Delete,
                                         contentDescription = ""
                                     )

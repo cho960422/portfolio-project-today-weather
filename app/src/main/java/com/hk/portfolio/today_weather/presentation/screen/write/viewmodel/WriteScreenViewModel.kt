@@ -9,6 +9,7 @@ import com.hk.portfolio.today_weather.core.JobState
 import com.hk.portfolio.today_weather.core.UiState
 import com.hk.portfolio.today_weather.domain.entity.event.EventEntity
 import com.hk.portfolio.today_weather.domain.entity.event.PlaceEntity
+import com.hk.portfolio.today_weather.domain.usecase.event.GetEventUseCase
 import com.hk.portfolio.today_weather.domain.usecase.event.InsertEventUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +23,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class WriteScreenViewModel @Inject constructor(
-    private val insertEventUseCase: InsertEventUseCase
+    private val insertEventUseCase: InsertEventUseCase,
+    private val getEventUseCase: GetEventUseCase
 ): ViewModel() {
     var name = mutableStateOf("")
         private set
@@ -40,6 +42,23 @@ class WriteScreenViewModel @Inject constructor(
         private set
     var submitState = mutableStateOf<UiState<Boolean>>(UiState())
         private set
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun updateExistEvent(inputId: String, onNext:(PlaceEntity) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val eventEntity = getEventUseCase(inputId)
+            id.value = eventEntity.id
+            onChangeStartDate(eventEntity.startDate)
+            onChangeEndDate(eventEntity.endDate)
+            onChangeAlarm(eventEntity.alarm?.toLocalTime())
+            if (eventEntity.endDate != null) {
+                onChangeMultiDay()
+            }
+            onChangeName(eventEntity.eventName)
+            onChangePlace(eventEntity.place)
+            onNext(eventEntity.place)
+        }
+    }
 
     fun onChangeName(s: String) {
         changeName(s)

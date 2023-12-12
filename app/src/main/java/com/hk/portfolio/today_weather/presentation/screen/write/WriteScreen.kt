@@ -58,6 +58,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.hk.portfolio.today_weather.core.dpToSp
+import com.hk.portfolio.today_weather.domain.entity.event.EventEntity
 import com.hk.portfolio.today_weather.domain.entity.event.PlaceEntity
 import com.hk.portfolio.today_weather.presentation.screen.write.viewmodel.WriteScreenViewModel
 import com.hk.portfolio.today_weather.ui.component.CheckboxAndText
@@ -73,8 +74,9 @@ import java.time.format.DateTimeFormatter
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WriteScreen(
-    isNew: Boolean,
+    id: String?,
     initPlace: PlaceEntity?,
+    onChangePlaceEntity: (PlaceEntity) -> Unit,
     onSearchButtonClicked: () -> Unit,
     onBackButtonClicked: () -> Unit
 ) {
@@ -94,6 +96,7 @@ fun WriteScreen(
     val alarm = viewModel.alarm.value
     val multiDay = viewModel.multiDay.value
     val submitState = viewModel.submitState
+    val editId = viewModel.id.value
 
     fun showSnackbarShort(message: String) {
         scope.launch {
@@ -127,6 +130,14 @@ fun WriteScreen(
 
     LaunchedEffect(Unit) {
         viewModel.onChangePlace(initPlace)
+    }
+
+    LaunchedEffect(id) {
+        if (id != null) {
+            viewModel.updateExistEvent(id) {
+                onChangePlaceEntity(it)
+            }
+        }
     }
 
     Scaffold(

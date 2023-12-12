@@ -30,10 +30,10 @@ fun HomeNavigation(navController: NavHostController, padding: PaddingValues) {
     ) {
         composable(Routers.HomeRouter.route) {
             HomeScreen {
-                navController.navigate(Routers.WriteRouter.route.replace("{isNew}", "1"))
+                navController.navigate(Routers.WriteRouter.route)
             }
         }
-        composable(Routers.EventListRouter.route) {
+        composable(Routers.EventListRouter.route) { navBackStackEntry ->
             EventListScreen(
                 onEventClicked = {
                     val latlng = WeatherUtil.convertGRID_GPS(
@@ -48,17 +48,19 @@ fun HomeNavigation(navController: NavHostController, padding: PaddingValues) {
                             .replace("{addressName}", it.eventEntity.place.addressName)
                     )
                 }
-            )
+            ) {
+                navController.navigate(Routers.WriteRouter.route.replace("{id}", it.id))
+            }
         }
         composable(
             Routers.WriteRouter.route,
             arguments = listOf(
-                navArgument("isNew") {
-                    type = NavType.IntType
+                navArgument("id") {
+                    type = NavType.StringType
                 }
             )
         ) { backStackEntry ->
-            val isNew = backStackEntry.arguments?.getInt("isNew") == 1
+            val id = backStackEntry.arguments?.getString("id")
             val addressName: String? = backStackEntry.savedStateHandle.get<String>("addressName")
             val detail: String? = backStackEntry.savedStateHandle.get<String>("detail")
             val nx: Double? = backStackEntry.savedStateHandle.get<Double>("nx")
@@ -74,10 +76,16 @@ fun HomeNavigation(navController: NavHostController, padding: PaddingValues) {
             } else null
 
             WriteScreen(
-                isNew = isNew,
+                id = id,
                 initPlace = data,
                 onSearchButtonClicked = {
                     navController.navigate(Routers.SearchRouter.route)
+                },
+                onChangePlaceEntity = {
+                    backStackEntry.savedStateHandle["addressName"] = it.addressName
+                    backStackEntry.savedStateHandle["nx"] = it.nx
+                    backStackEntry.savedStateHandle["ny"] = it.ny
+                    backStackEntry.savedStateHandle["detail"] = it.detail
                 }
             ) {
                 navController.popBackStack()

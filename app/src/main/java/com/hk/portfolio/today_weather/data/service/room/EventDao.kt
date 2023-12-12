@@ -8,6 +8,7 @@ import androidx.room.Transaction
 import androidx.room.Upsert
 import com.hk.portfolio.today_weather.data.dto.room.EventAndWeatherData
 import com.hk.portfolio.today_weather.data.dto.room.EventLocation
+import com.hk.portfolio.today_weather.domain.entity.event.EventEntity
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
@@ -30,4 +31,7 @@ interface EventDao {
 
     @Delete
     suspend fun deleteEventAndWeather(data: EventLocation)
+
+    @Query("SELECT * FROM event_location WHERE id = :id")
+    suspend fun getEvent(id:String): EventLocation
 }
