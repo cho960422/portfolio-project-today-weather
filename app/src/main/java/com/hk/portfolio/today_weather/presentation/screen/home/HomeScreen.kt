@@ -65,6 +65,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -80,6 +81,8 @@ import com.hk.portfolio.today_weather.R
 import com.hk.portfolio.today_weather.core.TourContentTypeEnum
 import com.hk.portfolio.today_weather.core.WeatherConditionEnum
 import com.hk.portfolio.today_weather.core.dpToSp
+import com.hk.portfolio.today_weather.core.findActivity
+import com.hk.portfolio.today_weather.core.moveByIntent
 import com.hk.portfolio.today_weather.presentation.screen.home.viewmodel.HomeScreenViewModel
 import com.hk.portfolio.today_weather.ui.component.EventAndWeatherCardView
 import kotlinx.coroutines.launch
@@ -136,6 +139,7 @@ fun HomeScreen(
         })
     val tourList = viewModel.tourList?.collectAsLazyPagingItems()
     val tourCnt = tourList?.itemCount ?: 0
+    val activity = LocalContext.current.findActivity()
 
     fun getTourList() {
         viewModel.getTourList(
@@ -376,6 +380,19 @@ fun HomeScreen(
                                                 .width(300.dp)
                                                 .aspectRatio(0.9f)
                                                 .clip(RoundedCornerShape(10.dp))
+                                                .clickable {
+                                                    try {
+                                                        val url =
+                                                            with(tourData) {
+                                                                "nmap://place?lat=$lat&lng=$lng&name=$name&appname=com.hk.portfolio.today_weather"
+                                                            }
+                                                        moveByIntent(activity, url)
+                                                    } catch (e: Exception) {
+                                                        val url =
+                                                            "market://details?id=com.nhn.android.nmap"
+                                                        moveByIntent(activity, url)
+                                                    }
+                                                }
                                         ) {
                                             Column(modifier = Modifier.fillMaxSize()) {
                                                 Box(
