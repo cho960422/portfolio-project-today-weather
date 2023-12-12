@@ -225,19 +225,41 @@ fun HomeScreen(
                         modifier = Modifier.padding(20.dp),
                         text = "오늘 방문하시는 곳"
                     )
-                    HorizontalPager(
-                        state = pagerState,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        with(todayEventList.value[it]) {
-                            EventAndWeatherCardView(
-                                weatherCondition = weatherEntity?.weatherCondition,
-                                name = eventEntity.eventName,
-                                addressDetail = eventEntity.place.detail,
-                                addressName = eventEntity.place.addressName,
-                                content = if (weatherEntity?.description != null) "현재 시간 이후로\n" + weatherEntity.description else "",
-                                isUpdate = isUpdating
-                            )
+                    if (todayEventList.value.isEmpty()) {
+                        Box(
+                            modifier = Modifier
+                                .clickable { onCreateButtonClicked() }
+                                .fillMaxWidth()
+                                .padding(vertical = 40.dp)
+                        ) {
+                            Column(
+                                modifier = Modifier.align(Alignment.Center),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = "오늘 방문하는 지역이 없습니다.\n방문하실 지역을 등록해보세요."
+                                )
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = ""
+                                )
+                            }
+                        }
+                    } else {
+                        HorizontalPager(
+                            state = pagerState,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            with(todayEventList.value[it]) {
+                                EventAndWeatherCardView(
+                                    weatherCondition = weatherEntity?.weatherCondition,
+                                    name = eventEntity.eventName,
+                                    addressDetail = eventEntity.place.detail,
+                                    addressName = eventEntity.place.addressName,
+                                    content = if (weatherEntity?.description != null) "현재 시간 이후로\n" + weatherEntity.description else "",
+                                    isUpdate = isUpdating
+                                )
+                            }
                         }
                     }
 
@@ -277,59 +299,61 @@ fun HomeScreen(
                         }
                     }
                     if (tourCnt == 0) {
-                        when (tourList?.loadState?.refresh) {
-                            is LoadState.Error -> {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(200.dp)
+                        if (todayEventList.value.isEmpty()) {
+                            Box(
+                                modifier = Modifier
+                                    .padding(vertical = 40.dp)
+                                    .fillMaxWidth()
+                                    .clickable { onCreateButtonClicked() }
+                            ) {
+                                Column(
+                                    modifier = Modifier.align(Alignment.Center),
+                                    horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
-                                    Column(
-                                        modifier = Modifier.align(Alignment.Center),
-                                        horizontalAlignment = Alignment.CenterHorizontally
-                                    ) {
-                                        Text(
-                                            text = "주변정보를 가져오지 못했습니다."
-                                        )
-                                        Icon(
-                                            modifier = Modifier.clickable { getTourList() },
-                                            imageVector = Icons.Default.Refresh,
-                                            contentDescription = ""
-                                        )
-                                    }
-                                }
-                            }
-
-                            else -> {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(200.dp)
-                                ) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier.align(Alignment.Center)
+                                    Text(
+                                        text = "오늘 방문하는 지역이 없습니다.\n방문하실 지역을 등록해보세요."
+                                    )
+                                    Icon(
+                                        imageVector = Icons.Default.Add,
+                                        contentDescription = ""
                                     )
                                 }
                             }
-                        }
-                    } else if (todayEventList.value.isEmpty()) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(200.dp)
-                        ) {
-                            Column(
-                                modifier = Modifier.align(Alignment.Center),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(
-                                    text = "오늘 방문하는 지역이 없습니다.\n방문하실 지역을 등록해보세요."
-                                )
-                                Icon(
-                                    modifier = Modifier.clickable { onCreateButtonClicked() },
-                                    imageVector = Icons.Default.Add,
-                                    contentDescription = ""
-                                )
+                        } else {
+                            when (tourList?.loadState?.refresh) {
+                                is LoadState.Error -> {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(200.dp)
+                                    ) {
+                                        Column(
+                                            modifier = Modifier.align(Alignment.Center),
+                                            horizontalAlignment = Alignment.CenterHorizontally
+                                        ) {
+                                            Text(
+                                                text = "주변정보를 가져오지 못했습니다."
+                                            )
+                                            Icon(
+                                                modifier = Modifier.clickable { getTourList() },
+                                                imageVector = Icons.Default.Refresh,
+                                                contentDescription = ""
+                                            )
+                                        }
+                                    }
+                                }
+
+                                else -> {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(200.dp)
+                                    ) {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier.align(Alignment.Center)
+                                        )
+                                    }
+                                }
                             }
                         }
                     } else {
