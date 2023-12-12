@@ -11,9 +11,11 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.hk.portfolio.today_weather.core.util.WeatherUtil
 import com.hk.portfolio.today_weather.domain.entity.event.PlaceEntity
 import com.hk.portfolio.today_weather.presentation.screen.home.EventListScreen
 import com.hk.portfolio.today_weather.presentation.screen.home.HomeScreen
+import com.hk.portfolio.today_weather.presentation.screen.tour_list.TourListScreen
 import com.hk.portfolio.today_weather.presentation.screen.write.SearchLocationScreen
 import com.hk.portfolio.today_weather.presentation.screen.write.WriteScreen
 
@@ -21,14 +23,32 @@ import com.hk.portfolio.today_weather.presentation.screen.write.WriteScreen
 @Composable
 fun HomeNavigation(navController: NavHostController, padding: PaddingValues) {
 
-    NavHost(navController = navController, startDestination = Routers.HomeRouter.route, modifier = Modifier.padding(padding)) {
+    NavHost(
+        navController = navController,
+        startDestination = Routers.HomeRouter.route,
+        modifier = Modifier.padding(padding)
+    ) {
         composable(Routers.HomeRouter.route) {
             HomeScreen {
                 navController.navigate(Routers.WriteRouter.route.replace("{isNew}", "1"))
             }
         }
         composable(Routers.EventListRouter.route) {
-            EventListScreen()
+            EventListScreen(
+                onEventClicked = {
+                    val latlng = WeatherUtil.convertGRID_GPS(
+                        WeatherUtil.TO_GPS,
+                        it.eventEntity.place.nx,
+                        it.eventEntity.place.ny
+                    )
+                    navController.navigate(
+                        Routers.TourListRouter.route.replace("{latitude}", latlng.lat.toString())
+                            .replace("{longitude}", latlng.lng.toString())
+                            .replace("{name}", it.eventEntity.eventName)
+                            .replace("{addressName}", it.eventEntity.place.addressName)
+                    )
+                }
+            )
         }
         composable(
             Routers.WriteRouter.route,
@@ -49,7 +69,7 @@ fun HomeNavigation(navController: NavHostController, padding: PaddingValues) {
                     addressName = addressName,
                     nx = nx,
                     ny = ny,
-                    detail = detail?:"알 수 없음"
+                    detail = detail ?: "알 수 없음"
                 )
             } else null
 
@@ -71,12 +91,48 @@ fun HomeNavigation(navController: NavHostController, padding: PaddingValues) {
              * 이 부분도 트러블슈팅
              */
             SearchLocationScreen(onSelectButtonClicked = {
-                navController.previousBackStackEntry?.savedStateHandle?.set("addressName", it.addressName)
+                navController.previousBackStackEntry?.savedStateHandle?.set(
+                    "addressName",
+                    it.addressName
+                )
                 navController.previousBackStackEntry?.savedStateHandle?.set("nx", it.nx)
                 navController.previousBackStackEntry?.savedStateHandle?.set("ny", it.ny)
                 navController.previousBackStackEntry?.savedStateHandle?.set("detail", it.detail)
                 navController.popBackStack()
             }) {
+                navController.popBackStack()
+            }
+        }
+        composable(
+            Routers.TourListRouter.route,
+            arguments = listOf(
+                navArgument(
+                    "latitude"
+                ) {
+                    type = NavType.FloatType
+                },
+                navArgument(
+                    "longitude"
+                ) {
+                    type = NavType.FloatType
+                },
+                navArgument(
+                    "name"
+                ) {
+                    type = NavType.StringType
+                },
+                navArgument(
+                    "addressName"
+                ) {
+                    type = NavType.StringType
+                },
+            )
+        ) {
+            val lat = it.arguments?.getFloat("latitude")?.toDouble() ?: 0.0
+            val lng = it.arguments?.getFloat("longitude")?.toDouble() ?: 0.0
+            val name = it.arguments?.getString("name") ?: "알 수 없음"
+            val addressName = it.arguments?.getString("addressName") ?: "알 수 없음"
+            TourListScreen(lat = lat, lng = lng, name = name, addressName = addressName) {
                 navController.popBackStack()
             }
         }

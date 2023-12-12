@@ -84,6 +84,7 @@ import com.hk.portfolio.today_weather.core.dpToSp
 import com.hk.portfolio.today_weather.core.findActivity
 import com.hk.portfolio.today_weather.core.moveByIntent
 import com.hk.portfolio.today_weather.presentation.screen.home.viewmodel.HomeScreenViewModel
+import com.hk.portfolio.today_weather.ui.component.AddressCard
 import com.hk.portfolio.today_weather.ui.component.EventAndWeatherCardView
 import kotlinx.coroutines.launch
 
@@ -137,7 +138,7 @@ fun HomeScreen(
                 }
             }
         })
-    val tourList = viewModel.tourList?.collectAsLazyPagingItems()
+    val tourList = viewModel.tourList.value?.collectAsLazyPagingItems()
     val tourCnt = tourList?.itemCount ?: 0
     val activity = LocalContext.current.findActivity()
 
@@ -374,86 +375,26 @@ fun HomeScreen(
                                 }
                             ) { idx ->
                                 tourList?.get(idx)?.let { tourData ->
-                                    with(tourData) {
-                                        ElevatedCard(
-                                            modifier = Modifier
-                                                .width(300.dp)
-                                                .aspectRatio(0.9f)
-                                                .clip(RoundedCornerShape(10.dp))
-                                                .clickable {
-                                                    try {
-                                                        val url =
-                                                            with(tourData) {
-                                                                "nmap://place?lat=$lat&lng=$lng&name=$name&appname=com.hk.portfolio.today_weather"
-                                                            }
-                                                        moveByIntent(activity, url)
-                                                    } catch (e: Exception) {
-                                                        val url =
-                                                            "market://details?id=com.nhn.android.nmap"
-                                                        moveByIntent(activity, url)
-                                                    }
+                                    AddressCard(
+                                        modifier = Modifier
+                                            .width(300.dp)
+                                            .aspectRatio(0.9f)
+                                            .clip(RoundedCornerShape(10.dp))
+                                            .clickable {
+                                                try {
+                                                    val url =
+                                                        with(tourData) {
+                                                            "nmap://place?lat=$lat&lng=$lng&name=$name&appname=com.hk.portfolio.today_weather"
+                                                        }
+                                                    moveByIntent(activity, url)
+                                                } catch (e: Exception) {
+                                                    val url =
+                                                        "market://details?id=com.nhn.android.nmap"
+                                                    moveByIntent(activity, url)
                                                 }
-                                        ) {
-                                            Column(modifier = Modifier.fillMaxSize()) {
-                                                Box(
-                                                    modifier = Modifier
-                                                        .fillMaxWidth()
-                                                        .weight(0.5f)
-                                                        .background(
-                                                            Color.White,
-                                                            RoundedCornerShape(11.dp)
-                                                        )
-                                                        .border(
-                                                            0.5.dp,
-                                                            Color.LightGray,
-                                                            RoundedCornerShape(11.dp)
-                                                        )
-                                                ) {
-                                                    if (image.isNotEmpty()) {
-                                                        AsyncImage(
-                                                            modifier = Modifier
-                                                                .fillMaxSize()
-                                                                .clip(RoundedCornerShape(10.dp)),
-                                                            model = image.replace("http", "https"),
-                                                            contentDescription = null,
-                                                            placeholder = painterResource(id = R.drawable.no_photo),
-                                                            contentScale = ContentScale.Crop
-                                                        )
-                                                    } else {
-                                                        Icon(
-                                                            modifier = Modifier
-                                                                .align(Alignment.Center)
-                                                                .size(40.dp),
-                                                            painter = painterResource(id = R.drawable.no_photo),
-                                                            contentDescription = ""
-                                                        )
-                                                    }
-                                                }
-
-                                                Column(
-                                                    modifier = Modifier
-                                                        .weight(0.5f)
-                                                        .padding(15.dp)
-                                                ) {
-                                                    Text(
-                                                        text = name,
-                                                        fontSize = 17.dp.dpToSp(),
-                                                        fontWeight = FontWeight.Bold
-                                                    )
-                                                    Spacer(modifier = Modifier.height(15.dp))
-                                                    Text(
-                                                        text = address + addressDetail,
-                                                        fontSize = 13.dp.dpToSp(),
-                                                        lineHeight = 15.dp.dpToSp()
-                                                    )
-                                                    Text(
-                                                        text = contentType.description,
-                                                        fontSize = 10.dp.dpToSp()
-                                                    )
-                                                }
-                                            }
-                                        }
-                                    }
+                                            },
+                                        tourData
+                                    )
                                 }
                             }
 

@@ -5,4 +5,5 @@ sealed class Routers(val route:String) {
     object EventListRouter: Routers("event_list")
     object WriteRouter: Routers("write/{isNew}")
     object SearchRouter: Routers("search")
+    object TourListRouter: Routers("tour/{latitude}/{longitude}/{name}/{addressName}")
 }

@@ -53,7 +53,7 @@ import java.time.format.DateTimeFormatter
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun EventListScreen(
-
+    onEventClicked:(EventAndWeatherEntity) -> Unit
 ) {
     val viewModel = hiltViewModel<EventListScreenViewModel>()
     val list = viewModel.items.collectAsLazyPagingItems()
@@ -168,6 +168,7 @@ fun EventListScreen(
                             formatter.format(list[index]?.eventEntity?.endDate)
                         }"
                     ListItem(
+                        modifier = Modifier.clickable { onEventClicked(list[index]!!) },
                         headlineContent = {
                             Text(text = list[index]?.eventEntity?.eventName ?: "알 수 없는 일정")
                         },

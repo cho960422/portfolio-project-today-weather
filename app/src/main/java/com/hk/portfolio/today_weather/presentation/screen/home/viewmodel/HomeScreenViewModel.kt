@@ -61,20 +61,10 @@ class HomeScreenViewModel @Inject constructor(
     var isUpdating = mutableStateOf(false)
         private set
     val todayEventList = getTodayEventUseCase(Unit).stateIn(viewModelScope, SharingStarted.Eagerly, listOf())
-    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(application.applicationContext)
-//    val locationCallback = object : LocationCallback() {
-//        @RequiresApi(Build.VERSION_CODES.O)
-//        override fun onLocationResult(locationResult: LocationResult) {
-//            val location = locationResult.locations.last()
-//            viewModelScope.launch {
-//            }
-//            Log.d("current Location :: ", "${location.latitude}, ${location.longitude}")
-//        }
-//    }
     var currentWeather = mutableStateOf<UiState<WeatherConditionEntity>>(UiState(isLoading = true))
         private set
     val locationClient = LocationServices.getFusedLocationProviderClient(application)
-    var tourList: Flow<PagingData<TourEntity>>? = null
+    var tourList = mutableStateOf<Flow<PagingData<TourEntity>>?>(null)
         private set
     private val CATEGORY_KEY = intPreferencesKey("category")
     val category: Flow<TourContentTypeEnum?> = application.baseContext.dataStore.data.map { preferences ->
@@ -226,9 +216,9 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     fun getTourList(event: EventAndWeatherEntity, category: TourContentTypeEnum?) {
-        tourList = null
+        tourList.value = null
         val latlng = WeatherUtil.convertGRID_GPS(TO_GPS, event.eventEntity.place.nx, event.eventEntity.place.ny)
-        tourList = Pager(
+        tourList.value = Pager(
             config = PagingConfig(
                 pageSize = 20
             ),
