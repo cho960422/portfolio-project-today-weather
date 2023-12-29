@@ -21,7 +21,8 @@ fun EventLocation.toEntity(): EventEntity {
         place = PlaceEntity(
             placeName, nx, ny, placeDetail
         ),
-        updateAt = updateAt
+        updateAt = updateAt,
+        broadcastId = broadcastId
     )
 }
 

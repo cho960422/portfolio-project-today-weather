@@ -18,4 +18,5 @@ data class EventLocation(
     @ColumnInfo("nx") val nx: Double,
     @ColumnInfo("ny") val ny: Double,
     @ColumnInfo("update_at") val updateAt: LocalDateTime,
+    @ColumnInfo("broadcast_id") val broadcastId: Int? = null,
 )

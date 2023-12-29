@@ -32,6 +32,14 @@ class EventRepositoryImpl @Inject constructor(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    override suspend fun getEventList(startDate: LocalDate?): List<EventEntity> {
+        val nowDate = startDate ?: LocalDate.now()
+        return dao.getEventList(startDate ?: nowDate).map {
+            it.toEntity()
+        }
+    }
+
     override fun getEventPagingSource(): PagingSource<Int, EventAndWeatherEntity> =
         EventLocationPagingSource(db)
 

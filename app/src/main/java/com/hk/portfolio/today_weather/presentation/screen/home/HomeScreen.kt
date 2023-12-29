@@ -1,6 +1,8 @@
 package com.hk.portfolio.today_weather.presentation.screen.home
 
 import android.Manifest
+import android.app.AlarmManager
+import android.content.Context
 import android.os.Build
 import android.view.RoundedCorner
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -83,10 +85,14 @@ import com.hk.portfolio.today_weather.core.WeatherConditionEnum
 import com.hk.portfolio.today_weather.core.dpToSp
 import com.hk.portfolio.today_weather.core.findActivity
 import com.hk.portfolio.today_weather.core.moveByIntent
+import com.hk.portfolio.today_weather.core.util.AlarmManagerUtil
+import com.hk.portfolio.today_weather.core.util.NotificationBuilder
 import com.hk.portfolio.today_weather.presentation.screen.home.viewmodel.HomeScreenViewModel
 import com.hk.portfolio.today_weather.ui.component.AddressCard
 import com.hk.portfolio.today_weather.ui.component.EventAndWeatherCardView
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import kotlin.random.Random
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @RequiresApi(Build.VERSION_CODES.O)
@@ -408,6 +414,18 @@ fun HomeScreen(
 
                     Spacer(modifier = Modifier.height(20.dp))
                 }
+            }
+            FloatingActionButton(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(16.dp),
+                onClick = {
+                    val alarmManager: AlarmManager = activity.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+                    AlarmManagerUtil.makePushAlarmSchedule(activity, LocalDateTime.now().plusSeconds(3), alarmManager)
+                },
+                containerColor = MaterialTheme.colorScheme.surface
+            ) {
+                Icon(imageVector = Icons.Filled.Create, contentDescription = null)
             }
             FloatingActionButton(
                 modifier = Modifier

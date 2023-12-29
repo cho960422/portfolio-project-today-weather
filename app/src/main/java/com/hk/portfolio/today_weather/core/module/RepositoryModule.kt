@@ -1,5 +1,6 @@
 package com.hk.portfolio.today_weather.core.module
 
+import com.hk.portfolio.today_weather.core.AlarmReceiver
 import com.hk.portfolio.today_weather.core.AppDatabase
 import com.hk.portfolio.today_weather.core.RetrofitBuilder
 import com.hk.portfolio.today_weather.data.repository.EventRepositoryImpl
@@ -15,6 +16,7 @@ import com.hk.portfolio.today_weather.domain.repository.KakaoLocationRepository
 import com.hk.portfolio.today_weather.domain.repository.SearchHistoryRepository
 import com.hk.portfolio.today_weather.domain.repository.TourRepository
 import com.hk.portfolio.today_weather.domain.repository.WeatherRepository
+import com.hk.portfolio.today_weather.domain.usecase.event.GetEventListUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

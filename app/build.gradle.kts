@@ -57,7 +57,7 @@ dependencies {
 
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
-    implementation("androidx.activity:activity-compose:1.8.1")
+    implementation("androidx.activity:activity-compose:1.8.2")
     implementation(platform("androidx.compose:compose-bom:2023.03.00"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
@@ -80,7 +80,7 @@ dependencies {
     implementation("com.google.dagger:hilt-android:2.48.1")
     kapt("com.google.dagger:hilt-android-compiler:2.48.1")
 
-    val room_version = "2.6.0"
+    val room_version = "2.6.1"
 
     implementation("androidx.room:room-runtime:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
@@ -91,7 +91,7 @@ dependencies {
     // hiltViewModel
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
     // Navigation For Compose
-    val nav_version = "2.7.5"
+    val nav_version = "2.7.6"
     val material3_version = "1.1.2"
     val material_version = "1.5.4"
 
@@ -99,19 +99,19 @@ dependencies {
     implementation("androidx.compose.material3:material3:$material3_version")
     implementation("androidx.compose.material:material:$material_version")
     // retrofit2 로그
-    implementation("com.squareup.okhttp3:okhttp:4.9.2")
-    implementation("com.squareup.okhttp3:logging-interceptor:3.14.9")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.2")
 
     val paging_version = "3.2.1"
 
-    implementation("androidx.paging:paging-runtime:$paging_version")
+    implementation("androidx.paging:paging-runtime-ktx:$paging_version")
 
     // alternatively - without Android dependencies for tests
-    testImplementation("androidx.paging:paging-common:$paging_version")
+    testImplementation("androidx.paging:paging-common-ktx:$paging_version")
 
     // optional - Jetpack Compose integration
     implementation("androidx.paging:paging-compose:3.3.0-alpha02")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0-rc01")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0-rc02")
 
     implementation("androidx.core:core-splashscreen:1.1.0-alpha02")
     implementation("com.google.accompanist:accompanist-swiperefresh:0.33.2-alpha")

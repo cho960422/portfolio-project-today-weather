@@ -1,5 +1,6 @@
 package com.hk.portfolio.today_weather
 
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -9,6 +10,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.LaunchedEffect
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.play.core.appupdate.AppUpdateManager
@@ -18,6 +21,8 @@ import com.google.android.play.core.install.InstallStateUpdatedListener
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
+import com.hk.portfolio.today_weather.core.checkNotificationPermission
+import com.hk.portfolio.today_weather.core.util.NotificationBuilder
 import com.hk.portfolio.today_weather.presentation.screen.MainNavigationComponent
 import com.hk.portfolio.today_weather.presentation.screen.MainViewModel
 import com.hk.portfolio.today_weather.ui.theme.TodayWeatherPortFolioTheme
@@ -91,11 +96,17 @@ class MainActivity : ComponentActivity() {
 
         // Before starting an update, register a listener for updates.
         appUpdateManager.registerListener(listener)
+        NotificationBuilder.createEventPushChannel(this)
 
         setContent {
             val viewModel = hiltViewModel<MainViewModel>()
             LaunchedEffect(Unit) {
                 viewModel.checkAndUpdateWeather()
+            }
+            LaunchedEffect(Unit) {
+                if (!checkNotificationPermission(this@MainActivity)) {
+                    this@MainActivity.requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 1)
+                }
             }
 
             TodayWeatherPortFolioTheme {

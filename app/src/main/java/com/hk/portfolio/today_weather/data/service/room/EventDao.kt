@@ -22,6 +22,9 @@ interface EventDao {
     @Query("SELECT * FROM event_location WHERE (start_date <= :date AND end_date > :date) OR ( start_date >= :date AND start_date <= :limitDate)")
     suspend fun getEventListAll(date: LocalDate, limitDate: LocalDate): List<EventAndWeatherData>
 
+    @Query("SELECT * FROM event_location WHERE (start_date <= :date AND end_date > :date) OR ( start_date = :date)")
+    suspend fun getEventList(date: LocalDate): List<EventLocation>
+
     @Upsert
     suspend fun upsertEvent(event: EventLocation)
 

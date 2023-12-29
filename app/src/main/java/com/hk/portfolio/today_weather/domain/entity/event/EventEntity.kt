@@ -11,5 +11,6 @@ data class EventEntity(
     val endDate: LocalDate?,
     val place: PlaceEntity,
     val alarm: LocalDateTime?,
-    val updateAt: LocalDateTime
+    val updateAt: LocalDateTime,
+    val broadcastId: Int?
 )
