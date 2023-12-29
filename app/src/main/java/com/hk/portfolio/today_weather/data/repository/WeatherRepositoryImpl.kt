@@ -42,6 +42,10 @@ class WeatherRepositoryImpl @Inject constructor(
             nx = nx,
             ny = ny
         )
+        val firstList = firstResponse.response?.body?.items?.item?.map {
+            it.toEntity()
+        }?: listOf()
+        resultArr.addAll(firstList)
         val total = firstResponse.response?.body?.totalCount?:0
         val endPage = total / offset + 1
         for (i in page .. endPage) {
@@ -92,8 +96,14 @@ class WeatherRepositoryImpl @Inject constructor(
             response.response.body?.items?.item?.map {
                 it.toEntity()
             }?: listOf();
+        } else if (response.response?.header?.resultCode == "10") {
+            listOf()
         } else {
             getShortWeather(nx, ny, requestDate.minusHours(1))
         }
+    }
+
+    override fun deleteWeatherByEventId(id: String) {
+        dao.deleteWeatherData(id)
     }
 }

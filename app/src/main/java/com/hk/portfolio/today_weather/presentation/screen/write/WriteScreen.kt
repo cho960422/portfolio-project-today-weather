@@ -133,7 +133,7 @@ fun WriteScreen(
     }
 
     LaunchedEffect(id) {
-        if (id != null) {
+        if (id?.isNotEmpty() == true) {
             viewModel.updateExistEvent(id) {
                 onChangePlaceEntity(it)
             }

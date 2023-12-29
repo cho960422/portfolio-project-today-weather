@@ -2,6 +2,7 @@ package com.hk.portfolio.today_weather.core.util
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import com.hk.portfolio.today_weather.core.WeatherCategoryEnum
 import com.hk.portfolio.today_weather.core.WeatherConditionEnum
 import com.hk.portfolio.today_weather.domain.entity.weather.WeatherEntity
 import java.time.LocalTime

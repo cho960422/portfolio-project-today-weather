@@ -1,16 +1,23 @@
 package com.hk.portfolio.today_weather.presentation.screen.write.viewmodel
 
+import android.app.AlarmManager
+import android.app.Application
+import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.hk.portfolio.today_weather.core.JobState
 import com.hk.portfolio.today_weather.core.UiState
 import com.hk.portfolio.today_weather.domain.entity.event.EventEntity
 import com.hk.portfolio.today_weather.domain.entity.event.PlaceEntity
+import com.hk.portfolio.today_weather.domain.usecase.event.DeleteEventUseCase
 import com.hk.portfolio.today_weather.domain.usecase.event.GetEventUseCase
 import com.hk.portfolio.today_weather.domain.usecase.event.InsertEventUseCase
+import com.hk.portfolio.today_weather.domain.usecase.weather.DeleteWeatherByEventIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
@@ -24,8 +31,12 @@ import javax.inject.Inject
 @HiltViewModel
 class WriteScreenViewModel @Inject constructor(
     private val insertEventUseCase: InsertEventUseCase,
-    private val getEventUseCase: GetEventUseCase
-): ViewModel() {
+    private val getEventUseCase: GetEventUseCase,
+    private val deleteWeatherByEventIdUseCase: DeleteWeatherByEventIdUseCase,
+    private val application: Application
+): AndroidViewModel(application = application) {
+    val alarmManager = application.getSystemService(Context.ALARM_SERVICE) as? AlarmManager
+
     var name = mutableStateOf("")
         private set
     var startDate = mutableStateOf<LocalDate?>(null)
@@ -38,25 +49,27 @@ class WriteScreenViewModel @Inject constructor(
         private set
     var id = mutableStateOf<String?>(null)
         private set
-    var multiDay = mutableStateOf<Boolean>(false)
+    var multiDay = mutableStateOf(false)
         private set
     var submitState = mutableStateOf<UiState<Boolean>>(UiState())
         private set
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun updateExistEvent(inputId: String, onNext:(PlaceEntity) -> Unit) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val eventEntity = getEventUseCase(inputId)
-            id.value = eventEntity.id
-            onChangeStartDate(eventEntity.startDate)
-            onChangeEndDate(eventEntity.endDate)
-            onChangeAlarm(eventEntity.alarm?.toLocalTime())
-            if (eventEntity.endDate != null) {
-                onChangeMultiDay()
+        if (id.value == null) {
+            viewModelScope.launch(Dispatchers.IO) {
+                val eventEntity = getEventUseCase(inputId)
+                id.value = eventEntity.id
+                onChangeStartDate(eventEntity.startDate)
+                onChangeEndDate(eventEntity.endDate)
+                onChangeAlarm(eventEntity.alarm?.toLocalTime())
+                if (eventEntity.endDate != null) {
+                    onChangeMultiDay()
+                }
+                onChangeName(eventEntity.eventName)
+                onChangePlace(eventEntity.place)
+                onNext(eventEntity.place)
             }
-            onChangeName(eventEntity.eventName)
-            onChangePlace(eventEntity.place)
-            onNext(eventEntity.place)
         }
     }
 
@@ -117,6 +130,12 @@ class WriteScreenViewModel @Inject constructor(
         val alarmDate = if (alarm.value != null)
             startDate.value!!.atStartOfDay().withHour(alarm.value!!.hour).withMinute(alarm.value!!.minute)
         else null
+        if (startDate.value!! >= LocalDate.now() && id.value?.isNotEmpty() == true) {
+            viewModelScope.launch(Dispatchers.IO) {
+                deleteWeatherByEventIdUseCase(id.value!!)
+            }
+        }
+
         val request = EventEntity(
             id = id.value?: "${startDate.value}-submit_at_${LocalDateTime.now()}",
             eventName = name.value,

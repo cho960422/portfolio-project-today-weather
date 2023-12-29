@@ -2,6 +2,7 @@ package com.hk.portfolio.today_weather.domain.usecase.weather
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import com.hk.portfolio.today_weather.core.WeatherCategoryEnum
 import com.hk.portfolio.today_weather.core.util.WeatherUtil
 import com.hk.portfolio.today_weather.domain.entity.weather.WeatherConditionEntity
 import com.hk.portfolio.today_weather.domain.entity.weather.WeatherEntity
@@ -25,9 +26,10 @@ class GetWeatherUseCase @Inject constructor(
                     nx.toInt(), ny.toInt(), baseDateTime, count, date
                 )
             }
+            val weatherCodeList = resultList.filter { it.category == WeatherCategoryEnum.RainForm }
 
-            val weatherCondition = WeatherUtil.exportWeatherCondition(resultList)
-            val description = WeatherUtil.exportDescription(resultList)
+            val weatherCondition = WeatherUtil.exportWeatherCondition(weatherCodeList)
+            val description = WeatherUtil.exportDescription(weatherCodeList)
             return WeatherConditionEntity(
                 id = param.eventId,
                 nx = param.nx,

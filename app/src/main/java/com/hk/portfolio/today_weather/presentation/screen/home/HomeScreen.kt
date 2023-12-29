@@ -303,28 +303,28 @@ fun HomeScreen(
                             }
                         }
                     }
-                    if (tourCnt == 0) {
-                        if (todayEventList.value.isEmpty()) {
-                            Box(
-                                modifier = Modifier
-                                    .padding(vertical = 40.dp)
-                                    .fillMaxWidth()
-                                    .clickable { onCreateButtonClicked() }
+                    if (todayEventList.value.isEmpty()) {
+                        Box(
+                            modifier = Modifier
+                                .padding(vertical = 40.dp)
+                                .fillMaxWidth()
+                                .clickable { onCreateButtonClicked() }
+                        ) {
+                            Column(
+                                modifier = Modifier.align(Alignment.Center),
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                Column(
-                                    modifier = Modifier.align(Alignment.Center),
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Text(
-                                        text = "오늘 방문하는 지역이 없습니다.\n방문하실 지역을 등록해보세요."
-                                    )
-                                    Icon(
-                                        imageVector = Icons.Default.Add,
-                                        contentDescription = ""
-                                    )
-                                }
+                                Text(
+                                    text = "오늘 방문하는 지역이 없습니다.\n방문하실 지역을 등록해보세요."
+                                )
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = ""
+                                )
                             }
-                        } else {
+                        }
+                    } else {
+                        if (tourCnt == 0) {
                             when (tourList?.loadState?.refresh) {
                                 is LoadState.Error -> {
                                     Box(
@@ -360,47 +360,47 @@ fun HomeScreen(
                                     }
                                 }
                             }
-                        }
-                    } else {
-                        LazyRow(
-                            modifier = Modifier.fillMaxWidth(),
-                            contentPadding = PaddingValues(horizontal = 20.dp),
-                            horizontalArrangement = Arrangement.spacedBy(10.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            items(
-                                count = tourCnt,
-                                key = {
-                                    it
+                        } else {
+                            LazyRow(
+                                modifier = Modifier.fillMaxWidth(),
+                                contentPadding = PaddingValues(horizontal = 20.dp),
+                                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                items(
+                                    count = tourCnt,
+                                    key = {
+                                        it
+                                    }
+                                ) { idx ->
+                                    tourList?.get(idx)?.let { tourData ->
+                                        AddressCard(
+                                            modifier = Modifier
+                                                .width(300.dp)
+                                                .aspectRatio(0.9f)
+                                                .clip(RoundedCornerShape(10.dp))
+                                                .clickable {
+                                                    try {
+                                                        val url =
+                                                            with(tourData) {
+                                                                "nmap://place?lat=$lat&lng=$lng&name=$name&appname=com.hk.portfolio.today_weather"
+                                                            }
+                                                        moveByIntent(activity, url)
+                                                    } catch (e: Exception) {
+                                                        val url =
+                                                            "market://details?id=com.nhn.android.nmap"
+                                                        moveByIntent(activity, url)
+                                                    }
+                                                },
+                                            tourData
+                                        )
+                                    }
                                 }
-                            ) { idx ->
-                                tourList?.get(idx)?.let { tourData ->
-                                    AddressCard(
-                                        modifier = Modifier
-                                            .width(300.dp)
-                                            .aspectRatio(0.9f)
-                                            .clip(RoundedCornerShape(10.dp))
-                                            .clickable {
-                                                try {
-                                                    val url =
-                                                        with(tourData) {
-                                                            "nmap://place?lat=$lat&lng=$lng&name=$name&appname=com.hk.portfolio.today_weather"
-                                                        }
-                                                    moveByIntent(activity, url)
-                                                } catch (e: Exception) {
-                                                    val url =
-                                                        "market://details?id=com.nhn.android.nmap"
-                                                    moveByIntent(activity, url)
-                                                }
-                                            },
-                                        tourData
-                                    )
-                                }
-                            }
 
-                            if (tourList?.loadState?.refresh is LoadState.Loading) {
-                                item {
-                                    CircularProgressIndicator()
+                                if (tourList?.loadState?.refresh is LoadState.Loading) {
+                                    item {
+                                        CircularProgressIndicator()
+                                    }
                                 }
                             }
                         }

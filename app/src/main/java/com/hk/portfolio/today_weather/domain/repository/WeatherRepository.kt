@@ -29,4 +29,5 @@ interface WeatherRepository {
      *  @return 패킷을 Entity로 전환한 목록을 반환, UseCase 에서 필요한 비즈니스 로직 실행
      */
     suspend fun getShortWeather(nx: Double, ny: Double, baseDateTime: LocalDateTime): List<WeatherShortEntity>
+    fun deleteWeatherByEventId(id:String)
 }

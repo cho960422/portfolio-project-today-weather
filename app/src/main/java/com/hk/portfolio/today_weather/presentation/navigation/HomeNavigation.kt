@@ -30,7 +30,7 @@ fun HomeNavigation(navController: NavHostController, padding: PaddingValues) {
     ) {
         composable(Routers.HomeRouter.route) {
             HomeScreen {
-                navController.navigate(Routers.WriteRouter.route)
+                navController.navigate(Routers.WriteRouter.route.replace("{id}", ""))
             }
         }
         composable(Routers.EventListRouter.route) { navBackStackEntry ->
