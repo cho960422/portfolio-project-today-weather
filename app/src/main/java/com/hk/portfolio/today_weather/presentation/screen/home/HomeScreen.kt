@@ -3,8 +3,12 @@ package com.hk.portfolio.today_weather.presentation.screen.home
 import android.Manifest
 import android.app.AlarmManager
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import android.view.RoundedCorner
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -44,6 +48,7 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -55,6 +60,7 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
 import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -82,6 +88,7 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.hk.portfolio.today_weather.R
 import com.hk.portfolio.today_weather.core.TourContentTypeEnum
 import com.hk.portfolio.today_weather.core.WeatherConditionEnum
+import com.hk.portfolio.today_weather.core.checkNotificationPermission
 import com.hk.portfolio.today_weather.core.dpToSp
 import com.hk.portfolio.today_weather.core.findActivity
 import com.hk.portfolio.today_weather.core.moveByIntent
@@ -103,14 +110,39 @@ fun HomeScreen(
     val viewModel = hiltViewModel<HomeScreenViewModel>()
     val refreshScope = rememberCoroutineScope()
     val isUpdating = viewModel.isUpdating.value
+    val activity = LocalContext.current.findActivity()
     val menuExpanded = remember {
         mutableStateOf(false)
     }
+    val locationPermissionDialog = remember {
+        mutableStateOf(false)
+    }
+    val notificationPermissionDialog = remember {
+        mutableStateOf(false)
+    }
+    val weatherLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            if (isGranted) {
+                viewModel.getCurrentWeather()
+            } else {
+                locationPermissionDialog.value = true
+            }
+        }
+    )
+    val notificationLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            if (!isGranted) {
+                notificationPermissionDialog.value = true
+            }
+        }
+    )
     val pullRefreshState = rememberPullRefreshState(
         refreshing = isUpdating,
         onRefresh = {
             refreshScope.launch {
-                viewModel.checkAndUpdateWeather()
+                weatherLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
             }
         }
     )
@@ -125,28 +157,8 @@ fun HomeScreen(
     val tourListSearchCondition = remember {
         mutableStateOf<Pair<Int, TourContentTypeEnum?>>(Pair(-1, null))
     }
-    val resultLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions(),
-        onResult = { permissions ->
-            // 사용자가 권한 팝업에서 어떠한 액션을 취했을 때에 대한 callback
-            when {
-                // 정확한 위치 권한을 허용했을 때
-                permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
-                    viewModel.getCurrentWeather()
-                }
-                // 대략적인 위치 권한을 허용했을 때
-                permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
-                    viewModel.getCurrentWeather()
-                }
-
-                else -> {
-                    // No location access granted.
-                }
-            }
-        })
     val tourList = viewModel.tourList.value?.collectAsLazyPagingItems()
     val tourCnt = tourList?.itemCount ?: 0
-    val activity = LocalContext.current.findActivity()
 
     fun getTourList() {
         viewModel.getTourList(
@@ -175,30 +187,40 @@ fun HomeScreen(
         }
     }
 
-    LaunchedEffect(lifecycleState) {
-        // Do something with your state
-        // You may want to use DisposableEffect or other alternatives
-        // instead of LaunchedEffect
-        when (lifecycleState) {
-            Lifecycle.State.DESTROYED -> {}
-            Lifecycle.State.INITIALIZED -> {}
-            Lifecycle.State.CREATED -> {}
-            Lifecycle.State.STARTED -> {}
-            Lifecycle.State.RESUMED -> {
-                viewModel.checkAndUpdateWeather()
-                resultLauncher.launch(
-                    arrayOf(
-                        Manifest.permission.ACCESS_COARSE_LOCATION
-                        // 권한을 추가로 요청할 것이라면 이 목록에 추가
-                    )
-                )
-            }
+    LaunchedEffect(Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            notificationLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
+        weatherLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
     }
 
     Surface(
         modifier = Modifier.fillMaxSize()
     ) {
+        if (locationPermissionDialog.value) {
+            PermissionDeniedDialog(
+                title = "안내",
+                content = "원활한 앱 사용을 위해 권한 허용이 필수적으로 필요합니다.\n현재 위치의 날씨를 가져오기 위해서 위치 권한이 필요합니다.",
+                onDismissClicked = {
+                    locationPermissionDialog.value = false
+                }
+            ) {
+                locationPermissionDialog.value = false
+                goToPermissionSetting(activity)
+            }
+        }
+        if (notificationPermissionDialog.value) {
+            PermissionDeniedDialog(
+                title = "안내",
+                content = "원활한 앱 사용을 위해 권한 허용이 필수적으로 필요합니다.\n일정 관련 알림을 보내드리기 위해서 알림 권한이 필요합니다.",
+                onDismissClicked = {
+                    notificationPermissionDialog.value = false
+                }
+            ) {
+                notificationPermissionDialog.value = false
+                goToPermissionSetting(activity)
+            }
+        }
         Box(modifier = Modifier.fillMaxSize()) {
             Box(
                 modifier = Modifier
@@ -417,18 +439,6 @@ fun HomeScreen(
             }
             FloatingActionButton(
                 modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .padding(16.dp),
-                onClick = {
-                    val alarmManager: AlarmManager = activity.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-                    AlarmManagerUtil.makePushAlarmSchedule(activity, LocalDateTime.now().plusSeconds(3), alarmManager)
-                },
-                containerColor = MaterialTheme.colorScheme.surface
-            ) {
-                Icon(imageVector = Icons.Filled.Create, contentDescription = null)
-            }
-            FloatingActionButton(
-                modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(16.dp),
                 onClick = { onCreateButtonClicked() },
@@ -446,4 +456,49 @@ fun HomeScreen(
             )
         }
     }
+}
+
+@Composable
+fun PermissionDeniedDialog(
+    title: String,
+    content: String,
+    onDismissClicked: () -> Unit,
+    onConfirmClicked: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = { onDismissClicked() },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onConfirmClicked()
+                }
+            ) {
+                Text(text = "설정으로 이동")
+            }
+        },
+        title = {
+            Text(text = title)
+        },
+        text = {
+            Text(text = content)
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    onDismissClicked()
+                }
+            ) {
+                Text(text = "닫기")
+            }
+        }
+    )
+}
+
+fun goToPermissionSetting(context: Context) {
+    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).also {
+        val uri = Uri.parse("package:${context.packageName}")
+        it.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        it.data = uri
+    }
+    context.startActivity(intent)
 }

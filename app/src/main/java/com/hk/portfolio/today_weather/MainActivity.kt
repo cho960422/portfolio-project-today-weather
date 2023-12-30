@@ -1,15 +1,23 @@
 package com.hk.portfolio.today_weather
 
+import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -102,11 +110,6 @@ class MainActivity : ComponentActivity() {
             val viewModel = hiltViewModel<MainViewModel>()
             LaunchedEffect(Unit) {
                 viewModel.checkAndUpdateWeather()
-            }
-            LaunchedEffect(Unit) {
-                if (!checkNotificationPermission(this@MainActivity)) {
-                    this@MainActivity.requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 1)
-                }
             }
 
             TodayWeatherPortFolioTheme {

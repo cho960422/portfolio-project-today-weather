@@ -96,7 +96,7 @@ class HomeScreenViewModel @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun checkAndUpdateWeather() {
         isUpdating.value = true
-        delay(1000)
+        delay(500)
         viewModelScope.launch {
             getCurrentWeather()
         }
@@ -220,7 +220,7 @@ class HomeScreenViewModel @Inject constructor(
         val latlng = WeatherUtil.convertGRID_GPS(TO_GPS, event.eventEntity.place.nx, event.eventEntity.place.ny)
         tourList.value = Pager(
             config = PagingConfig(
-                pageSize = 20
+                pageSize = 30
             ),
             initialKey = 1,
             pagingSourceFactory = {

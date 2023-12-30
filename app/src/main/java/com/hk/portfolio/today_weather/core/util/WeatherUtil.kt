@@ -47,10 +47,10 @@ object WeatherUtil {
         } + "에 비" else null
         val snowStr = if (snowArr?.isNotEmpty() == true) snowArr.joinToString(", "){
             DateTimeFormatter.ofPattern("HH:mm").format(it)
-        } + "에 는" else null
+        } + "에 눈" else null
         val rainSnowStr = if (rainSnow?.isNotEmpty() == true) rainSnow.joinToString(", "){
             DateTimeFormatter.ofPattern("HH:mm").format(it)
-        } + "에 는/비" else null
+        } + "에 눈/비" else null
         val strArr = mutableListOf<String>()
 
         if (rainStr != null) strArr.add(rainStr)
@@ -119,11 +119,12 @@ object WeatherUtil {
         resultMap[WeatherConditionEnum.Snow] = mutableListOf()
         resultMap[WeatherConditionEnum.RainOrSnow] = mutableListOf()
         list.forEach {
-            if (rainSet[WeatherConditionEnum.Rain] == true) {
+            val code = WeatherConditionEnum.findByCode(it.valueForCategory.toInt())
+            if (rainSet[code] == true) {
                 resultMap[WeatherConditionEnum.Rain]?.add(it.dateTime.toLocalTime())
-            } else if (rainSet[WeatherConditionEnum.Snow] == true) {
+            } else if (snowSet[code] == true) {
                 resultMap[WeatherConditionEnum.Snow]?.add(it.dateTime.toLocalTime())
-            } else if (rainSet[WeatherConditionEnum.RainOrSnow] == true) {
+            } else if (rainSnowSet[code] == true) {
                 resultMap[WeatherConditionEnum.RainOrSnow]?.add(it.dateTime.toLocalTime())
             }
         }

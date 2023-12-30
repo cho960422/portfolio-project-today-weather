@@ -12,6 +12,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.hk.portfolio.today_weather.core.JobState
 import com.hk.portfolio.today_weather.core.UiState
+import com.hk.portfolio.today_weather.core.util.AlarmManagerUtil
 import com.hk.portfolio.today_weather.domain.entity.event.EventEntity
 import com.hk.portfolio.today_weather.domain.entity.event.PlaceEntity
 import com.hk.portfolio.today_weather.domain.usecase.event.DeleteEventUseCase
@@ -36,7 +37,6 @@ class WriteScreenViewModel @Inject constructor(
     private val application: Application
 ): AndroidViewModel(application = application) {
     val alarmManager = application.getSystemService(Context.ALARM_SERVICE) as? AlarmManager
-
     var name = mutableStateOf("")
         private set
     var startDate = mutableStateOf<LocalDate?>(null)
@@ -48,6 +48,8 @@ class WriteScreenViewModel @Inject constructor(
     var alarm = mutableStateOf<LocalTime?>(null)
         private set
     var id = mutableStateOf<String?>(null)
+        private set
+    var notificationId = mutableStateOf<Int?>(null)
         private set
     var multiDay = mutableStateOf(false)
         private set
@@ -130,12 +132,10 @@ class WriteScreenViewModel @Inject constructor(
         val alarmDate = if (alarm.value != null)
             startDate.value!!.atStartOfDay().withHour(alarm.value!!.hour).withMinute(alarm.value!!.minute)
         else null
-        if (startDate.value!! >= LocalDate.now() && id.value?.isNotEmpty() == true) {
-            viewModelScope.launch(Dispatchers.IO) {
-                deleteWeatherByEventIdUseCase(id.value!!)
-            }
-        }
-
+        val mNotificationId: Int? = if (id.value == null && alarmDate != null && notificationId.value == null) {
+            AlarmManagerUtil.makeNotificationId(alarmDate)
+        } else notificationId.value
+        val alarmManager: AlarmManager = application.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val request = EventEntity(
             id = id.value?: "${startDate.value}-submit_at_${LocalDateTime.now()}",
             eventName = name.value,
@@ -144,8 +144,19 @@ class WriteScreenViewModel @Inject constructor(
             place = place.value!!,
             alarm = alarmDate,
             updateAt = LocalDateTime.now(),
-            broadcastId = null
+            broadcastId = mNotificationId
         )
+
+        if (startDate.value!! >= LocalDate.now() && id.value?.isNotEmpty() == true) {
+            viewModelScope.launch(Dispatchers.IO) {
+                deleteWeatherByEventIdUseCase(id.value!!)
+            }
+        }
+        if (alarmDate == null) {
+            if (notificationId.value != null) AlarmManagerUtil.cancelPushAlarmSchedule(application, mNotificationId?: 0, alarmManager)
+        } else {
+            AlarmManagerUtil.makePushAlarmSchedule(application, mNotificationId?: 0, request, alarmDate, alarmManager)
+        }
         viewModelScope.launch(Dispatchers.IO) {
             insertEventUseCase(request).onEach {
                 when (it) {
