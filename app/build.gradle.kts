@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
+import org.jetbrains.kotlin.konan.properties.Properties
 
 plugins {
     id("com.android.application")
@@ -6,6 +7,9 @@ plugins {
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
 }
+
+val localProperties = Properties()
+localProperties.load(project.rootProject.file("local.properties").inputStream())
 
 android {
     namespace = "com.hk.portfolio.today_weather"
@@ -25,12 +29,25 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField("String", "KAKAO_API_KEY", "" + localProperties["KAKAO_API_KEY"])
+            buildConfigField("String", "TOUR_API_KEY", "" + localProperties["TOUR_API_KEY"])
+            buildConfigField("String", "TOUR_HOST", "" + localProperties["TOUR_HOST"])
+            buildConfigField("String", "WEATHER_API_KEY", "" + localProperties["WEATHER_API_KEY"])
+            buildConfigField("String", "WEATHER_HOST", "" + localProperties["WEATHER_HOST"])
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+
+            buildConfigField("String", "KAKAO_API_KEY", "" + localProperties["KAKAO_API_KEY"])
+            buildConfigField("String", "TOUR_API_KEY", "" + localProperties["TOUR_API_KEY"])
+            buildConfigField("String", "TOUR_HOST", "" + localProperties["TOUR_HOST"])
+            buildConfigField("String", "WEATHER_API_KEY", "" + localProperties["WEATHER_API_KEY"])
+            buildConfigField("String", "WEATHER_HOST", "" + localProperties["WEATHER_HOST"])
         }
     }
     compileOptions {
@@ -42,6 +59,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.4.3"
